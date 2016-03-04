@@ -18,13 +18,13 @@ class ServicesEndpointTests extends ServicesWebTestCase {
   public function testEndpointForm() {
     $edit = $this->populateEndpointFAPI();
 // Create and log in our privileged user.
-    $this->privilegedUser = $this->drupalCreateUser(array(
+    $this->privilegedUser = $this->backdropCreateUser(array(
       'administer services',
       'administer site configuration',
     ));
-    $this->drupalLogin($this->privilegedUser);
-    $this->drupalPost('admin/structure/services/add', $edit, 'Save');
-    $this->drupalGet($edit['path']);
+    $this->backdropLogin($this->privilegedUser);
+    $this->backdropPost('admin/structure/services/add', $edit, 'Save');
+    $this->backdropGet($edit['path']);
   }
 
   /**
@@ -32,15 +32,15 @@ class ServicesEndpointTests extends ServicesWebTestCase {
    */
   public function testSuccessfulAddEndpoint() {
     $edit = $this->populateEndpointFAPI();
-    $this->privilegedUser = $this->drupalCreateUser(array(
+    $this->privilegedUser = $this->backdropCreateUser(array(
       'administer services',
       'administer content types',
       'administer site configuration',
     ));
-    $this->drupalLogin($this->privilegedUser);
-    $this->drupalPost('admin/structure/services/add', $edit, 'Save');
+    $this->backdropLogin($this->privilegedUser);
+    $this->backdropPost('admin/structure/services/add', $edit, 'Save');
     $this->assertResponse('200', 'expected 200');
-    $this->drupalGet('admin/structure/services');
+    $this->backdropGet('admin/structure/services');
     $this->assertResponse('200', 'expected 200');
 
     $this->assertText($edit['name'], 'Endpoint path appears');
@@ -53,13 +53,13 @@ class ServicesEndpointTests extends ServicesWebTestCase {
   public function testMissingPath() {
     $edit = $this->populateEndpointFAPI();
     unset($edit['path']);
-    $this->privilegedUser = $this->drupalCreateUser(array(
+    $this->privilegedUser = $this->backdropCreateUser(array(
       'administer services',
       'administer content types',
       'administer site configuration',
     ));
-    $this->drupalLogin($this->privilegedUser);
-    $this->drupalPost('admin/structure/services/add', $edit, 'Save');
+    $this->backdropLogin($this->privilegedUser);
+    $this->backdropPost('admin/structure/services/add', $edit, 'Save');
     $this->assertResponse('200', 'expected 200');
 
     $this->assertText('Path to endpoint field is required.', 'Endpoint path missing error message.');
@@ -71,13 +71,13 @@ class ServicesEndpointTests extends ServicesWebTestCase {
   public function testMissingServer() {
     $edit = $this->populateEndpointFAPI();
     unset($edit['server']);
-    $this->privilegedUser = $this->drupalCreateUser(array(
+    $this->privilegedUser = $this->backdropCreateUser(array(
       'administer services',
       'administer content types',
       'administer site configuration',
     ));
-    $this->drupalLogin($this->privilegedUser);
-    $this->drupalPost('admin/structure/services/add', $edit, 'Save');
+    $this->backdropLogin($this->privilegedUser);
+    $this->backdropPost('admin/structure/services/add', $edit, 'Save');
     $this->assertResponse('200', 'expected 200');
 
     $this->assertText('Server field is required.', 'Server missing error message.');

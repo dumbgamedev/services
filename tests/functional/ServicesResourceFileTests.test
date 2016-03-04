@@ -22,23 +22,22 @@ class ServicesResourceFileTests extends ServicesWebTestCase {
    */
   public function setUp() {
     parent::setUp(
-      'ctools',
       'services',
       'rest_server'
     );
     // Set up endpoint.
     $this->endpoint =  $this->saveNewEndpoint();
     // Create and log in our privileged user.
-    $this->privileged_user = $this->drupalCreateUser(array(
+    $this->privileged_user = $this->backdropCreateUser(array(
       'get any binary files',
       'save file information',
       'administer services',
       'administer site configuration',
       'bypass node access',
     ));
-    $this->drupalLogin($this->privileged_user);
+    $this->backdropLogin($this->privileged_user);
     // Get a test file.
-    $this->testfiles = $this->drupalGetTestFiles('image');
+    $this->testfiles = $this->backdropGetTestFiles('image');
     $this->testfile = current($this->testfiles);
   }
 
@@ -132,7 +131,7 @@ class ServicesResourceFileTests extends ServicesWebTestCase {
    * Test create method (Legacy).
    *
    * TODO: To be removed in future version.
-   * @see http://drupal.org/node/1083242
+   * @see http://backdrop.org/node/1083242
    */
   public function testResourceFileCreateLegacy() {
     // Create file argument with data.

@@ -69,7 +69,7 @@ class ServicesContentTypeNegotiator implements ServicesContentTypeNegotiatorInte
    *   Negotiated response format. For example 'json'.
    */
   public function getResponseFormatContentTypeNegotiations(&$mime_type, $canonical_path, $formats, $context) {
-    drupal_add_http_header('Vary', 'Accept');
+    backdrop_add_http_header('Vary', 'Accept');
 
     // Negotiate response format based on accept-headers if we
     // don't have a response format.
@@ -84,7 +84,7 @@ class ServicesContentTypeNegotiator implements ServicesContentTypeNegotiatorInte
     }
 
     // Get the best matching format, default to json
-    $response_format = variable_get('rest_server_default_response_format', 'json');
+    $response_format = config_get('services.settings', 'rest_server_default_response_format');
     $http_accept = $context->getServerVariable('HTTP_ACCEPT');
     if (!empty($http_accept)) {
       $mime = $this->mimeParse();

@@ -8,7 +8,7 @@ class MockServicesRESTServerFactory extends ServicesRESTServerFactory {
 
   public function __construct($data = array()) {
     parent::__construct($data);
-    drupal_static_reset();
+    backdrop_static_reset();
   }
 
   protected function getContext() {

@@ -72,7 +72,7 @@ This more or less duplicates the functionality of the comment index:
 
     Get comments: GET /services/rest/comments?nid=123
 
-[apachesolr]: http://drupal.org/project/apachesolr "Apache Solr Search Integration"
+[apachesolr]: http://backdrop.org/project/apachesolr "Apache Solr Search Integration"
 [comment_resource]: http://github.com/hugowetterberg/comment_resource "Comment resource"
 [services_oop]: http://github.com/hugowetterberg/services_oop "Services OOP"
 [oauth-rest]: http://github.com/hugowetterberg/services/tree/oauth-rest "Services oAuth REST branch"

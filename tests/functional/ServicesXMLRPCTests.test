@@ -1,6 +1,6 @@
 <?php
 
-class ServicesXMLRPCTestCase extends DrupalWebTestCase {
+class ServicesXMLRPCTestCase extends BackdropWebTestCase {
   // Endpoint details.
   protected $endpoint = NULL;
   // Session ID.
@@ -20,7 +20,7 @@ class ServicesXMLRPCTestCase extends DrupalWebTestCase {
   }
 
   public function setUp() {
-    parent::setUp('ctools', 'services', 'xmlrpc_server', 'services_test_resource');
+    parent::setUp('services', 'xmlrpc_server', 'services_test_resource');
     // Set up endpoint.
     $this->endpoint =  $this->saveNewEndpoint();
   }
@@ -28,7 +28,7 @@ class ServicesXMLRPCTestCase extends DrupalWebTestCase {
   /**
    * Test list.Methods call.
    *
-   * Regression http://drupal.org/node/1072844.
+   * Regression http://backdrop.org/node/1072844.
    */
   function testlistMethods() {
     $result = $this->servicesXMLRPC('system.listMethods', array());
@@ -40,7 +40,7 @@ class ServicesXMLRPCTestCase extends DrupalWebTestCase {
    */
   function testUserLogin() {
     // Create user.
-    $user = $this->drupalCreateUser(array('access user profiles'));
+    $user = $this->backdropCreateUser(array('access user profiles'));
     $args = array(
       'username' => $user->name,
       'password' => $user->pass_raw,
@@ -66,7 +66,7 @@ class ServicesXMLRPCTestCase extends DrupalWebTestCase {
   /**
    * Precedence CRUD methods > Actions > Relations > Targeted Actions
    *
-   * @see http://drupal.org/node/1016350
+   * @see http://backdrop.org/node/1016350
    */
   function testPrecedence() {
     $args = array('arg1' => $this->randomName());

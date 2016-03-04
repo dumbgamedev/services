@@ -21,7 +21,6 @@ class ServicesParserTests extends ServicesWebTestCase {
    */
   public function setUp() {
     parent::setUp(
-      'ctools',
       'services',
       'rest_server'
     );
@@ -84,10 +83,10 @@ class ServicesParserTests extends ServicesWebTestCase {
    * Testing parser functionality.
    */
   public function testParser() {
-    $account = $this->drupalCreateUser();
+    $account = $this->backdropCreateUser();
 
     // Logout first.
-    $this->drupalLogout();
+    $this->backdropLogout();
 
     // Try to login. By default servicesPost uses
     // 'application/x-www-form-urlencoded' type. So it should be refused.
@@ -101,10 +100,10 @@ class ServicesParserTests extends ServicesWebTestCase {
    * Do JSON call. Ensure it is parsed properly.
    */
   public function testJSONCall() {
-    $account = $this->drupalCreateUser();
+    $account = $this->backdropCreateUser();
 
     // Logout first.
-    $this->drupalLogout();
+    $this->backdropLogout();
 
     // Do JSON call to login.
     $response = $this->servicesPost($this->endpoint->path . '/user/login', array('username' => $account->name, 'password' => $account->pass_raw), array(), 'json');

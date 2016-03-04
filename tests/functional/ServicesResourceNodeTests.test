@@ -25,7 +25,6 @@ class ServicesResourceNodetests extends ServicesWebTestCase {
    */
   public function setUp() {
     parent::setUp(
-      'ctools',
       'services',
       'rest_server',
       'comment'
@@ -50,18 +49,18 @@ class ServicesResourceNodetests extends ServicesWebTestCase {
    */
   public function testNewEndpointResourceNodeIndex() {
     // Create and log in our privileged user.
-    $this->privilegedUser = $this->drupalCreateUser(array(
+    $this->privilegedUser = $this->backdropCreateUser(array(
       'administer services',
       'perform unlimited index queries',
     ));
-    $this->drupalLogin($this->privilegedUser);
+    $this->backdropLogin($this->privilegedUser);
 
     // Create a set of nodes. The node resource returns 20 returns at a time,
     // so we create two pages and a half worth.
     $nodes = array();
     $count = 50;
     for ($i = 0; $i < $count; $i++) {
-      $node = $this->drupalCreateNode();
+      $node = $this->backdropCreateNode();
       $nodes[$node->nid] = $node;
     }
 
@@ -99,10 +98,10 @@ class ServicesResourceNodetests extends ServicesWebTestCase {
     $this->assertTrue(count($responseArray['body']) == 40, 'Correct number of items returned');
 
     // Swap to user that can only use the default pager size.
-    $this->lessPrivilegedUser = $this->drupalCreateUser(array(
+    $this->lessPrivilegedUser = $this->backdropCreateUser(array(
       'administer services',
     ));
-    $this->drupalLogin($this->lessPrivilegedUser);
+    $this->backdropLogin($this->lessPrivilegedUser);
     $responseArray = $this->servicesGet($this->endpoint->path . '/node', array('fields' => 'nid,title', 'pagesize' => 40));
     $this->assertTrue(count($responseArray['body']) == 20, 'Correct number of items returned');
   }
@@ -112,11 +111,11 @@ class ServicesResourceNodetests extends ServicesWebTestCase {
    */
   public function testNewEndpointResourceNodeGet() {
     // Create and log in our privileged user.
-    $this->privilegedUser = $this->drupalCreateUser(array(
+    $this->privilegedUser = $this->backdropCreateUser(array(
       'administer services',
     ));
-    $this->drupalLogin($this->privilegedUser);
-    $node = $this->drupalCreateNode();
+    $this->backdropLogin($this->privilegedUser);
+    $node = $this->backdropCreateNode();
     $responseArray = $this->servicesGet($this->endpoint->path . '/node/' . $node->nid);
     $this->assertTrue($node->title == $responseArray['body']->title,
       'Successfully received Node info', 'NodeResource: Retrieve');
@@ -131,11 +130,11 @@ class ServicesResourceNodetests extends ServicesWebTestCase {
    */
   function testCommentLoadNodeComments() {
     $path = $this->endpoint->path;
-    $this->privileged_user = $this->drupalCreateUser();
-    $this->drupalLogin($this->privileged_user);
+    $this->privileged_user = $this->backdropCreateUser();
+    $this->backdropLogin($this->privileged_user);
 
     // Create node with commenting.
-    $node = $this->drupalCreateNode();
+    $node = $this->backdropCreateNode();
     $nid = $node->nid;
 
     // Generate 15 comments for node.
@@ -147,7 +146,7 @@ class ServicesResourceNodetests extends ServicesWebTestCase {
     }
 
     // Generate some comments for another node.
-    $node2 = $this->drupalCreateNode();
+    $node2 = $this->backdropCreateNode();
     for ($i = 1; $i <= 5; $i++) {
       $comment = (object)$this->getCommentValues($node2->nid);
       comment_save($comment);
@@ -171,11 +170,11 @@ class ServicesResourceNodetests extends ServicesWebTestCase {
    */
   public function testEndpointResourceNodeCreate() {
     // Create and log in our privileged user.
-    $this->privilegedUser = $this->drupalCreateUser(array(
+    $this->privilegedUser = $this->backdropCreateUser(array(
       'administer services',
       'bypass node access',
     ));
-    $this->drupalLogin($this->privilegedUser);
+    $this->backdropLogin($this->privilegedUser);
     $node = array(
       'title' => 'testing',
       'body' => array(LANGUAGE_NONE => array(array('value' => $this->randomString()))),
@@ -197,15 +196,15 @@ class ServicesResourceNodetests extends ServicesWebTestCase {
    * Testing node_resource Create (Legacy).
    *
    * TODO: To be removed in future version.
-   * @see http://drupal.org/node/1083242
+   * @see http://backdrop.org/node/1083242
    */
   public function testEndpointResourceNodeCreateLegacy() {
     // Create and log in our privileged user.
-    $this->privilegedUser = $this->drupalCreateUser(array(
+    $this->privilegedUser = $this->backdropCreateUser(array(
       'administer services',
       'bypass node access',
     ));
-    $this->drupalLogin($this->privilegedUser);
+    $this->backdropLogin($this->privilegedUser);
     $node = array(
       'title' => 'testing',
       'body' => array(LANGUAGE_NONE => array(array('value' => $this->randomString()))),
@@ -228,10 +227,10 @@ class ServicesResourceNodetests extends ServicesWebTestCase {
    */
   public function testEndpointResourceNodeCreateFail() {
     // Create and log in our privileged user.
-    $this->privilegedUser = $this->drupalCreateUser(array(
+    $this->privilegedUser = $this->backdropCreateUser(array(
       'administer services',
     ));
-    $this->drupalLogin($this->privilegedUser);
+    $this->backdropLogin($this->privilegedUser);
     $node = array(
       'title' => 'testing',
       'body' => array(LANGUAGE_NONE => array(array('value' => $this->randomString()))),
@@ -250,11 +249,11 @@ class ServicesResourceNodetests extends ServicesWebTestCase {
    */
   public function testEndpointResourceNodeCreateMissingTitle() {
     // Create and log in our privileged user.
-    $this->privilegedUser = $this->drupalCreateUser(array(
+    $this->privilegedUser = $this->backdropCreateUser(array(
       'administer services',
       'bypass node access',
     ));
-    $this->drupalLogin($this->privilegedUser);
+    $this->backdropLogin($this->privilegedUser);
 
     $node = array(
       'title' => '',
@@ -277,17 +276,17 @@ class ServicesResourceNodetests extends ServicesWebTestCase {
   public function testAttachFileTargetedAction() {
     // We will do test on the article node type.
     // Create and log in our privileged user.
-    $account = $this->drupalCreateUser(array(
+    $account = $this->backdropCreateUser(array(
       'bypass node access',
     ));
-    $this->drupalLogin($account);
+    $this->backdropLogin($account);
 
     // Create article node.
     $settings = array('type' => 'article');
-    $node = $this->drupalCreateNode($settings);
+    $node = $this->backdropCreateNode($settings);
 
     // Get a test file.
-    $testfiles = $this->drupalGetTestFiles('image');
+    $testfiles = $this->backdropGetTestFiles('image');
     $testfile1 = array_pop($testfiles);
     $testfile2 = array_pop($testfiles);
 
@@ -338,7 +337,7 @@ class ServicesResourceNodetests extends ServicesWebTestCase {
    *    Integer how should the type value be treated.
    */
   function update_node($exclude_type) {
-    $node = $this->drupalCreateNode();
+    $node = $this->backdropCreateNode();
     $node_update = (array) $node;
     $node_update['title'] = $this->randomName();
     $node_update['body'][LANGUAGE_NONE][0]['value'] = $this->randomName();
@@ -364,11 +363,11 @@ class ServicesResourceNodetests extends ServicesWebTestCase {
    */
   public function testEndpointResourceNodeUpdate() {
     // Create and log in our privileged user.
-    $this->privilegedUser = $this->drupalCreateUser(array(
+    $this->privilegedUser = $this->backdropCreateUser(array(
       'administer services',
       'bypass node access',
     ));
-    $this->drupalLogin($this->privilegedUser);
+    $this->backdropLogin($this->privilegedUser);
 
     $this->update_node(SERVICES_NODE_TYPE_INCLUDE);
     $this->update_node(SERVICES_NODE_TYPE_EMPTY);
@@ -379,16 +378,16 @@ class ServicesResourceNodetests extends ServicesWebTestCase {
    * Testing node_resource Update (Legacy).
    *
    * TODO: To be removed in future version.
-   * @see http://drupal.org/node/1083242
+   * @see http://backdrop.org/node/1083242
    */
   public function testEndpointResourceNodeUpdateLegacy() {
     // Create and log in our privileged user.
-    $this->privilegedUser = $this->drupalCreateUser(array(
+    $this->privilegedUser = $this->backdropCreateUser(array(
       'administer services',
       'bypass node access',
     ));
-    $this->drupalLogin($this->privilegedUser);
-    $node = $this->drupalCreateNode();
+    $this->backdropLogin($this->privilegedUser);
+    $node = $this->backdropCreateNode();
 
     $node_update = (array) $node;
     $node_update['title'] = $this->randomName();
@@ -408,15 +407,15 @@ class ServicesResourceNodetests extends ServicesWebTestCase {
   */
   public function testEndpointResourceNodeUpdatePermFail() {
     // Create and log in our privileged user.
-    $this->privilegedUser = $this->drupalCreateUser(array(
+    $this->privilegedUser = $this->backdropCreateUser(array(
       'administer services',
       'create page content',
       'edit own page content',
     ));
-    $this->drupalLogin($this->privilegedUser);
+    $this->backdropLogin($this->privilegedUser);
 
     // Create node from user no 1.
-    $node = $this->drupalCreateNode(array('uid' => 1));
+    $node = $this->backdropCreateNode(array('uid' => 1));
 
     // Try to update this node with different user not
     // having permission to edit any story content.
@@ -435,12 +434,12 @@ class ServicesResourceNodetests extends ServicesWebTestCase {
    */
   public function testEndpointResourceNodeUpdateMissingTitle() {
     // Create and log in our privileged user.
-    $this->privilegedUser = $this->drupalCreateUser(array(
+    $this->privilegedUser = $this->backdropCreateUser(array(
       'administer services',
       'bypass node access',
     ));
-    $this->drupalLogin($this->privilegedUser);
-    $node = $this->drupalCreateNode();
+    $this->backdropLogin($this->privilegedUser);
+    $node = $this->backdropCreateNode();
     $node_update = array(
       'title' => '',
       'body' => array(LANGUAGE_NONE => array(array('value' => $this->randomString()))),
@@ -458,12 +457,12 @@ class ServicesResourceNodetests extends ServicesWebTestCase {
    */
   public function testEndpointResourceNodeDelete() {
     // Create and log in our privileged user.
-    $this->privilegedUser = $this->drupalCreateUser(array(
+    $this->privilegedUser = $this->backdropCreateUser(array(
       'administer services',
       'bypass node access',
     ));
-    $this->drupalLogin($this->privilegedUser);
-    $node = $this->drupalCreateNode();
+    $this->backdropLogin($this->privilegedUser);
+    $node = $this->backdropCreateNode();
     $data = '';
 
     $responseArray = $this->servicesDelete($this->endpoint->path . '/node/' . $node->nid, $data);
@@ -504,14 +503,13 @@ class ServicesResourceNodeTaxonomytests extends ServicesWebTestCase {
    */
   public function setUp() {
     parent::setUp(
-      'ctools',
       'services',
       'rest_server',
       'taxonomy'
     );
 
-    $this->admin_user = $this->drupalCreateUser(array('administer taxonomy', 'bypass node access', 'administer services'));
-    $this->drupalLogin($this->admin_user);
+    $this->admin_user = $this->backdropCreateUser(array('administer taxonomy', 'bypass node access', 'administer services'));
+    $this->backdropLogin($this->admin_user);
     $this->vocabulary = $this->createVocabulary();
 
     $field = array(
@@ -591,7 +589,7 @@ class ServicesResourceNodeTaxonomytests extends ServicesWebTestCase {
     $vocabulary = new stdClass();
     $vocabulary->name = $this->randomName();
     $vocabulary->description = $this->randomName();
-    $vocabulary->machine_name = drupal_strtolower($this->randomName());
+    $vocabulary->machine_name = backdrop_strtolower($this->randomName());
     $vocabulary->help = '';
     $vocabulary->nodes = array('article' => 'article');
     $vocabulary->weight = mt_rand(0, 10);

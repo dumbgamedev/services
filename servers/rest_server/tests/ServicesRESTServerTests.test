@@ -4,7 +4,7 @@
 /**
  * Unit tests for RESTServer class.
  */
-class ServicesRESTServerTests extends DrupalUnitTestCase {
+class ServicesRESTServerTests extends BackdropUnitTestCase {
 
   /**
    * Implementation of getInfo().
@@ -217,7 +217,7 @@ class ServicesRESTServerTests extends DrupalUnitTestCase {
 
     $test_data = array('username' => 1, 'password' => 2);
 
-    $factory_args['context_data']['request_body'] = drupal_http_build_query($test_data, '', '&');
+    $factory_args['context_data']['request_body'] = backdrop_http_build_query($test_data, '', '&');
     $factory_args['context_data']['server']['CONTENT_TYPE'] = 'application/x-www-form-urlencoded';
     $rest_server = $this->getRESTSever($factory_args);
     $decoded_data = $rest_server->protectedParseRequestBody();
@@ -520,7 +520,7 @@ class ServicesRESTServerTests extends DrupalUnitTestCase {
               'optional' => TRUE,
               'type' => 'int',
               'description' => 'Number of records to get per page.',
-              'default value' => variable_get('services_node_index_page_size', 20),
+              'default value' => config_get('services.settings', 'services_node_index_page_size'),
               'source' => array('param' => 'pagesize'),
             ),
           ),

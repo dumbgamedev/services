@@ -22,16 +22,15 @@ class ServicesResourceUsertests extends ServicesWebTestCase {
    */
   public function setUp() {
     parent::setUp(
-      'ctools',
       'services',
       'rest_server'
     );
     // Set up endpoint.
     $this->endpoint =  $this->saveNewEndpoint();
     // Set up privileged user and login.
-    $this->privileged_user = $this->drupalCreateUser(array('administer users', 'access user profiles'));
-    $this->regular_user = $this->drupalCreateUser(array('access user profiles'));
-    $this->drupalLogin($this->privileged_user);
+    $this->privileged_user = $this->backdropCreateUser(array('administer users', 'access user profiles'));
+    $this->regular_user = $this->backdropCreateUser(array('access user profiles'));
+    $this->backdropLogin($this->privileged_user);
   }
 
   /**
@@ -80,7 +79,7 @@ class ServicesResourceUsertests extends ServicesWebTestCase {
    * Test create method (Legacy).
    *
    * TODO: To be removed in future version.
-   * @see http://drupal.org/node/1083242
+   * @see http://backdrop.org/node/1083242
    */
   function testCreateUserLegacy() {
     // Create user.
@@ -115,7 +114,7 @@ class ServicesResourceUsertests extends ServicesWebTestCase {
    */
   function testRegisterUser() {
     // Verify logged out state can create users
-    $this->drupalLogout();
+    $this->backdropLogout();
 
     $username = $this->randomName();
     $password = user_password();
@@ -126,8 +125,8 @@ class ServicesResourceUsertests extends ServicesWebTestCase {
     $user['mail']   = $user['name'] . '@example.com';
     $user['status'] = 1;
 
-    variable_set('user_email_verification', FALSE);
-    variable_set('user_register', TRUE);
+    config_set('system.core', 'user_email_verification', FALSE);
+    config_set('system.core', 'user_register', TRUE);
 
     $response = $this->servicesPost($this->endpoint->path . '/user/register', $user);
     $account = $response['body'];
@@ -154,11 +153,11 @@ class ServicesResourceUsertests extends ServicesWebTestCase {
    * Test register method (Legacy).
    *
    * TODO: To be removed in future version.
-   * @see http://drupal.org/node/1083242
+   * @see http://backdrop.org/node/1083242
    */
   function testRegisterUserLegacy() {
     //Verify logged out state can create users
-    $this->drupalLogout();
+    $this->backdropLogout();
 
     $user = array();
     $user['name']   = $this->randomName();
@@ -193,7 +192,7 @@ class ServicesResourceUsertests extends ServicesWebTestCase {
    */
   function testUpdateUserName() {
     // Create user.
-    $account = $this->drupalCreateUser();
+    $account = $this->backdropCreateUser();
     $name = $this->randomName();
     // Update mail of the user.
     $updated_account = array(
@@ -204,7 +203,7 @@ class ServicesResourceUsertests extends ServicesWebTestCase {
     $user_load = user_load($account->uid);
     $this->assertEqual($name, $user_load->name,
       'You are allowed to change a username as administer users perm.',
-      'User Resource : Test to check for drupal.org issue #1853592');
+      'User Resource : Test to check for backdrop.org issue #1853592');
   }
 
   /**
@@ -214,9 +213,9 @@ class ServicesResourceUsertests extends ServicesWebTestCase {
    */
   function testUpdateUserRolesWithRegularAccount() {
     // Create user.
-    $account = $this->drupalCreateUser();
-    $this->drupalLogout();
-    $this->drupalLogin($this->regular_user);
+    $account = $this->backdropCreateUser();
+    $this->backdropLogout();
+    $this->backdropLogin($this->regular_user);
     // Update the roles of the user.
     $updated_account = array(
       'mail' => $this->randomName() . '@example.com',
@@ -238,14 +237,14 @@ class ServicesResourceUsertests extends ServicesWebTestCase {
    */
   function testUpdateUserOwnUserRoles() {
     // Create user with minimal permission
-    $account = $this->drupalCreateUser();
-    $this->drupalLogout();
+    $account = $this->backdropCreateUser();
+    $this->backdropLogout();
     // Login
-    $this->drupalLogin($account);
+    $this->backdropLogin($account);
 
     // Not strictly necessary but illustrates the problem
     $role_name = $this->randomName();
-    $role_rid = $this->drupalCreateRole(array('administer users'), $role_name);
+    $role_rid = $this->backdropCreateRole(array('administer users'), $role_name);
 
     $user_load_before = user_load($account->uid);
 
@@ -272,7 +271,7 @@ class ServicesResourceUsertests extends ServicesWebTestCase {
    */
   function testUpdateUser() {
     // Create user.
-    $account = $this->drupalCreateUser();
+    $account = $this->backdropCreateUser();
 
     // Update mail of the user.
     $updated_account = array(
@@ -292,11 +291,11 @@ class ServicesResourceUsertests extends ServicesWebTestCase {
    * Test update method (Legacy).
    *
    * TODO: To be removed in future version.
-   * @see http://drupal.org/node/1083242
+   * @see http://backdrop.org/node/1083242
    */
   function testUpdateUserLegacy() {
     // Create user.
-    $account = $this->drupalCreateUser();
+    $account = $this->backdropCreateUser();
 
     // Update mail of the user.
     $updated_account = array(
@@ -317,7 +316,7 @@ class ServicesResourceUsertests extends ServicesWebTestCase {
    */
   function testDeleteUser() {
     // Create user.
-    $account = $this->drupalCreateUser();
+    $account = $this->backdropCreateUser();
 
     // Delete user.
     $response = $this->servicesDelete($this->endpoint->path . '/user/' . $account->uid);
@@ -331,7 +330,7 @@ class ServicesResourceUsertests extends ServicesWebTestCase {
    */
   function testCancelUser() {
     // Create our privileged user.
-    $account = $this->drupalCreateUser(array('administer services'));
+    $account = $this->backdropCreateUser(array('administer services'));
 
     // Cancel user.
     $response = $this->servicesPost($this->endpoint->path . '/user/' . $account->uid . '/cancel');
@@ -361,7 +360,7 @@ class ServicesResourceUsertests extends ServicesWebTestCase {
    */
   function testPasswordReset() {
     // Create user.
-    $account = $this->drupalCreateUser(array('administer services'));
+    $account = $this->backdropCreateUser(array('administer services'));
 
     // Password Reset user.
     $response = $this->servicesPost($this->endpoint->path . '/user/' . $account->uid . '/password_reset');
@@ -379,7 +378,7 @@ class ServicesResourceUsertests extends ServicesWebTestCase {
    */
   function testResendWelcomeEmail() {
     // Create user.
-    $account = $this->drupalCreateUser(array('administer services'));
+    $account = $this->backdropCreateUser(array('administer services'));
 
     // Password Reset user.
     $response = $this->servicesPost($this->endpoint->path . '/user/' . $account->uid . '/resend_welcome_email');
@@ -415,7 +414,7 @@ class ServicesResourceUsertests extends ServicesWebTestCase {
     // Create several users.
     $accounts = array();
     for ($i = 0; $i < 5; $i++) {
-      $account = $this->drupalCreateUser();
+      $account = $this->backdropCreateUser();
       $accounts[$account->uid] = $account;
     }
 
@@ -480,10 +479,10 @@ class ServicesResourceUsertests extends ServicesWebTestCase {
    * Login with wrong credentials (to get error).
    */
   function testUserLogin() {
-    $account = $this->drupalCreateUser();
+    $account = $this->backdropCreateUser();
 
     // Logout first.
-    $this->drupalLogout();
+    $this->backdropLogout();
 
     $response = $this->servicesPost($this->endpoint->path . '/user/login', array('username' => $account->name, 'password' => $account->pass_raw));
 
@@ -504,13 +503,13 @@ class ServicesResourceUsertests extends ServicesWebTestCase {
     $this->loggedInUser = $response_data->user;
 
     // Try to login with another user to get error.
-    $account2 = $this->drupalCreateUser();
+    $account2 = $this->backdropCreateUser();
     $response = $this->servicesPost($this->endpoint->path . '/user/login', array('username' => $account2->name, 'password' => $account2->pass_raw));
     $this->assertTrue(strpos($response['status'], 'Already logged in as ' . $account->name) !== FALSE,
       'Session is properly opened for logged in user.', 'UserResource: Login');
 
     // Logout.
-    $this->drupalLogout();
+    $this->backdropLogout();
 
     // Try to login with wrong credentials.
     $response = $this->servicesPost($this->endpoint->path . '/user/login',
@@ -527,10 +526,10 @@ class ServicesResourceUsertests extends ServicesWebTestCase {
   function testUserLoginMethodAPI_1_1() {
     $this->endpoint = $this->saveNewVersionEndpoint('1.1');
     $path = $this->endpoint->path;
-    $account = $this->drupalCreateUser();
+    $account = $this->backdropCreateUser();
 
     // Logout first.
-    $this->drupalLogout();
+    $this->backdropLogout();
 
     $response = $this->servicesPost($this->endpoint->path . '/user/login', array('username' => $account->name, 'password' => $account->pass_raw));
 
@@ -547,7 +546,7 @@ class ServicesResourceUsertests extends ServicesWebTestCase {
                   && isset($response_data->user)
                   && $response_data->user->name == $account->name;
     $this->assertTrue($proper_answer, 'User successfully logged in.', 'UserResource: Login');
-    $this->drupalLogout();
+    $this->backdropLogout();
     $responseArray = $this->servicesPost($this->endpoint->path . '/user/login', array('name' => $account->name, 'pass' => $account->pass_raw),
       array('services_user_login_version: 1.1'));
     $this->assertTrue($responseArray['code'] == '200', 'Arguments should be old arguments and we should be logged in.',
@@ -568,10 +567,10 @@ class ServicesResourceUsertests extends ServicesWebTestCase {
    *  and get IP blocking error
    */
   function testUserLoginFloodControl() {
-    $account = $this->drupalCreateUser();
+    $account = $this->backdropCreateUser();
 
     // Logout first
-    $this->drupalLogout();
+    $this->backdropLogout();
 
     // First failed login (wrong password)
     $response = $this->servicesPost($this->endpoint->path . '/user/login', array('username' => $account->name, 'password' => $this->randomString()));
@@ -580,7 +579,7 @@ class ServicesResourceUsertests extends ServicesWebTestCase {
     $this->assertTrue(strpos($response['status'], 'Wrong username or password') !== FALSE,
       'User cannot login with wrong username / password.', 'UserResource: Login');
 
-    $account_blocking_limit = variable_get('user_failed_login_user_limit', 5);
+    $account_blocking_limit = config_get('user.flood', 'flood_user_limit';
 
     // Go through set of default error while we're having attempts
     if ($account_blocking_limit > 2) {
@@ -597,19 +596,19 @@ class ServicesResourceUsertests extends ServicesWebTestCase {
       'After ' . $account_blocking_limit . '-th failed login account is temporary blocked.', 'UserResource: Login Flood Control');
 
     // Test IP blocking
-    $ip_blocking_limit = variable_get('user_failed_login_ip_limit', 50);
-    $account2 = $this->drupalCreateUser();
+    $ip_blocking_limit = config_get('user.flood', 'flood_ip_limit');
+    $account2 = $this->backdropCreateUser();
 
     // Provide necessary count of test users to get 50 failed attempts without account blocking
     for ($i = 0; $i < $ip_blocking_limit - $account_blocking_limit - 1; $i++) {
       if ($i % $account_blocking_limit === 0) {
-        $account2 = $this->drupalCreateUser();
+        $account2 = $this->backdropCreateUser();
       }
 
       $this->servicesPost($this->endpoint->path . '/user/login', array('username' => $account2->name, 'password' => $this->randomString()));
     }
 
-    $account2 = $this->drupalCreateUser();
+    $account2 = $this->backdropCreateUser();
 
     // Now ip will be locked after 50 failed attempts
     $response = $this->servicesPost($this->endpoint->path . '/user/login', array('username' => $account2->name, 'password' => $account2->pass_raw));
@@ -625,10 +624,10 @@ class ServicesResourceUsertests extends ServicesWebTestCase {
     // Logout via REST call.
     $response = $this->servicesPost($this->endpoint->path . '/user/logout');
     // Try logout second time.
-    $this->drupalGet('user/logout');
+    $this->backdropGet('user/logout');
     $this->assertText('You are not authorized to access this page', 'User logout successfully.', 'UserResource: Logout');
     // Login again.
-    $this->drupalLogin($this->privileged_user);
+    $this->backdropLogin($this->privileged_user);
     // Logout via REST call.
     $response = $this->servicesPost($this->endpoint->path . '/user/logout');
     // Try to logout second time via REST call.
@@ -642,7 +641,7 @@ class ServicesResourceUsertests extends ServicesWebTestCase {
    */
   function testRequestNewPassword() {
     // Create user.
-    $account = $this->drupalCreateUser(array('administer services'));
+    $account = $this->backdropCreateUser(array('administer services'));
 
     // Request new password for user by name.
     $data = array('name' => $account->name);
@@ -665,10 +664,10 @@ class ServicesResourceUsertests extends ServicesWebTestCase {
       'Resource to request new password for non-existing user name returned content not acceptable.',
       'UserResource: request_new_password');
 
-    // Assert that 2 e-mails were sent in this test. The drupalGetMails()
+    // Assert that 2 e-mails were sent in this test. The backdropGetMails()
     // method does not provide immediate feedback about e-mails sent during the
     // test, and so this assertion can only be done at this point.
-    $mails = $this->drupalGetMails();
+    $mails = $this->backdropGetMails();
     $this->assertEqual(2, count($mails), 'Only 2 e-mails were sent during this test.');
   }
 }

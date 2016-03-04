@@ -11,16 +11,16 @@ class services_ctools_export_ui extends ctools_export_ui {
    * Page callback for the resources page.
    */
   function resources_page($js, $input, $item) {
-    drupal_set_title($this->get_page_title('resources', $item));
-    return drupal_get_form('services_edit_form_endpoint_resources', $item);
+    backdrop_set_title($this->get_page_title('resources', $item));
+    return backdrop_get_form('services_edit_form_endpoint_resources', $item);
   }
 
   /**
    * Page callback for the server page.
    */
   function server_page($js, $input, $item) {
-    drupal_set_title($this->get_page_title('server', $item));
-    return drupal_get_form('services_edit_form_endpoint_server', $item);
+    backdrop_set_title($this->get_page_title('server', $item));
+    return backdrop_get_form('services_edit_form_endpoint_server', $item);
   }
 
 
@@ -28,16 +28,16 @@ class services_ctools_export_ui extends ctools_export_ui {
    * Page callback for the authentication page.
    */
   function authentication_page($js, $input, $item) {
-    drupal_set_title($this->get_page_title('authentication', $item));
-    return drupal_get_form('services_edit_form_endpoint_authentication', $item);
+    backdrop_set_title($this->get_page_title('authentication', $item));
+    return backdrop_get_form('services_edit_form_endpoint_authentication', $item);
   }
 
   /**
    * Page callback for the resource authentication page.
    */
   function resource_authentication_page($js, $input, $item) {
-    drupal_set_title($this->get_page_title('resource_authentication', $item));
-    return drupal_get_form('services_edit_form_endpoint_resource_authentication', $item);
+    backdrop_set_title($this->get_page_title('resource_authentication', $item));
+    return backdrop_get_form('services_edit_form_endpoint_resource_authentication', $item);
   }
 
   // Avoid standard submit of edit form by ctools.
@@ -48,7 +48,7 @@ class services_ctools_export_ui extends ctools_export_ui {
 
     menu_rebuild();
     if (!$js) {
-      drupal_goto(ctools_export_ui_plugin_base_path($this->plugin));
+      backdrop_goto(ctools_export_ui_plugin_base_path($this->plugin));
     }
     else {
       return $this->list_page($js, $input);
@@ -112,7 +112,7 @@ function services_edit_form_endpoint_authentication($form, &$form_state) {
     else {
       $form[$module]['message'] = array(
         '#type'   => 'item',
-        '#markup'  => t('@module has no settings available.', array('@module' => drupal_ucfirst($module))),
+        '#markup'  => t('@module has no settings available.', array('@module' => backdrop_ucfirst($module))),
       );
     }
   }
@@ -134,7 +134,7 @@ function services_edit_form_endpoint_authentication_submit($form, $form_state) {
     }
   }
 
-  drupal_set_message(t('Your authentication options have been saved.'));
+  backdrop_set_message(t('Your authentication options have been saved.'));
   services_endpoint_save($endpoint);
 }
 
@@ -207,7 +207,7 @@ function services_edit_form_endpoint_server_submit($form, $form_state) {
   $endpoint->server_settings = $values;
   services_endpoint_save($endpoint);
 
-  drupal_set_message(t('Your server settings have been saved.'));
+  backdrop_set_message(t('Your server settings have been saved.'));
 }
 
 /**
@@ -222,9 +222,9 @@ function services_edit_endpoint_resources($endpoint) {
     $endpoint = services_endpoint_load($endpoint);
   }
   if ($endpoint && !empty($endpoint->title)) {
-    drupal_set_title($endpoint->title);
+    backdrop_set_title($endpoint->title);
   }
-  return drupal_get_form('services_edit_form_endpoint_resources', $endpoint);
+  return backdrop_get_form('services_edit_form_endpoint_resources', $endpoint);
 }
 
 /**
@@ -246,11 +246,11 @@ function services_edit_form_endpoint_resources($form, &$form_state, $endpoint) {
 
   $form['#attached']['js'] = array(
     'misc/tableselect.js',
-    drupal_get_path('module', 'services') . '/js/services.admin.js',
+    backdrop_get_path('module', 'services') . '/js/services.admin.js',
   );
 
   $form['#attached']['css'] = array(
-    drupal_get_path('module', 'services') . '/css/services.admin.css',
+    backdrop_get_path('module', 'services') . '/css/services.admin.css',
   );
 
   $ops = array(
@@ -353,7 +353,7 @@ function services_edit_form_endpoint_resources($form, &$form_state, $endpoint) {
           );
 
           // Let modules add their own settings.
-          drupal_alter('controller_settings', $controller_settings, $info);
+          backdrop_alter('controller_settings', $controller_settings, $info);
 
           // Get service update versions.
           $update_versions = services_get_update_versions($resource_key, $op_name);
@@ -472,7 +472,7 @@ function services_edit_form_endpoint_resources_submit($form, $form_state) {
   }
   $endpoint->resources = $resources;
   services_endpoint_save($endpoint);
-  drupal_set_message('Resources have been saved');
+  backdrop_set_message('Resources have been saved');
 }
 
 /**

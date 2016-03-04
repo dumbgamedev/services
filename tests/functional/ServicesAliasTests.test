@@ -17,7 +17,6 @@ class ServicesAliasTests extends ServicesWebTestCase {
    */
   public function setUp() {
     parent::setUp(
-      'ctools',
       'services',
       'rest_server'
     );
@@ -94,10 +93,10 @@ class ServicesAliasTests extends ServicesWebTestCase {
    * Testing parser functionality.
    */
   public function testAlias() {
-    $account = $this->drupalCreateUser();
+    $account = $this->backdropCreateUser();
 
     // Logout first.
-    $this->drupalLogout();
+    $this->backdropLogout();
 
     // Try to login using alias.
     $response = $this->servicesPost($this->endpoint->path . '/user-alias/login', array('username' => $account->name, 'password' => $account->pass_raw));
@@ -114,11 +113,11 @@ class ServicesAliasTests extends ServicesWebTestCase {
    */
   public function testUnderscoreAlias() {
     // Create and log in our privileged user.
-    $this->privilegedUser = $this->drupalCreateUser(array(
+    $this->privilegedUser = $this->backdropCreateUser(array(
       'administer services',
     ));
-    $this->drupalLogin($this->privilegedUser);
-    $node = $this->drupalCreateNode();
+    $this->backdropLogin($this->privilegedUser);
+    $node = $this->backdropCreateNode();
     $responseArray = $this->servicesGet($this->endpoint->path . '/node_alias/' . $node->nid);
     $this->assertTrue($node->title == $responseArray['body']->title,
       'Successfully received Node info', 'Alias: node Retrieve');

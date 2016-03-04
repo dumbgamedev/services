@@ -89,7 +89,7 @@ function services_schema() {
     'fields' => array(
       'uid' => array(
         'type'        => 'int',
-        'description' => 'User id that has been created by Drupal',
+        'description' => 'User id that has been created by Backdrop',
         'unsigned'    => TRUE,
         'not null'    => TRUE,
       ),
@@ -146,11 +146,11 @@ function services_requirements($phase) {
       );
     }
 
-    $services_security_update = variable_get('services_security_update_1', FALSE);
+    $services_security_update = config_get('services.settings', 'services_security_update_1');
     if(!$services_security_update) {
       $url = url('admin/config/services/services-security');
       $requirements['services'] = array(
-        'description' => $t('Services has issued a security update with the most recent module release. Administrative steps are required to secure your Drupal installation <a href="!url">here</a>.', array('!url' => $url)),
+        'description' => $t('Services has issued a security update with the most recent module release. Administrative steps are required to secure your Backdrop installation <a href="!url">here</a>.', array('!url' => $url)),
         'severity' => REQUIREMENT_ERROR,
         'value' => 'Steps needed',
         'title' => 'Services Authentication Mechanism',
@@ -168,7 +168,46 @@ function services_install() {
   $ret = array();
   //Set our security update to true since it wont need to be displayed
   //on the status report page
-  variable_set('services_security_update_1', TRUE);
+  // variable_set('services_security_update_1', TRUE);
+  config_set('services.settings', "services_resource_index_page_size", 20);
+  config_set('services.settings', 'file_public_path', '');
+  config_set('services.settings', 'password_inc', 'includes/password.inc');
+  config_set('services.settings', 'rest_server_default_response_format', 'json');
+  config_set('services.settings', 'services_allowed_create_content_types', array());
+  config_set('services.settings', 'services_comment_index_page_size', 20);
+  config_set('services.settings', 'services_comment_save_button_resource_create', t('Save'));
+  config_set('services.settings', 'services_comment_save_button_resource_update', t('Save'));
+  config_set('services.settings', 'services_file_index_page_size', 20);
+  config_set('services.settings', 'services_flood_control_enabled', TRUE);
+  config_set('services.settings', 'services_flood_control_enabled', TRUE);
+  config_set('services.settings', 'services_node_index_page_size', 20);
+  config_set('services.settings', 'services_node_index_page_size', 20);
+  config_set('services.settings', 'services_node_index_page_size', 20);
+  config_set('services.settings', 'services_node_save_button_post_resource_create', t('Save'));
+  config_set('services.settings', 'services_node_save_button_page_resource_update', t('Save'));
+  config_set('services.settings', 'services_oauth_authentication_levels', array());
+  config_set('services.settings', 'services_oauth_authorization_settings', array());
+  config_set('services.settings', 'services_rest_server_factory_class', 'ServicesRESTServerFactory');
+  config_set('services.settings', 'services_security_reset_limit_per_batch', 10);
+  config_set('services.settings', 'services_security_update_1', FALSE);
+  config_set('services.settings', 'services_security_update_1', FALSE);
+  config_set('services.settings', 'services_taxonomy_term_index_page_size', 20);
+  config_set('services.settings', 'services_taxonomy_vocabulary_index_page_size', 20);
+  config_set('services.settings', 'services_user_create_button_resource_create', t('Create new account'));
+  config_set('services.settings', 'services_user_index_page_size', 20);
+  config_set('services.settings', 'services_user_save_button_resource_update', t('Save'));
+  config_set('services.settings', 'simpletest_maximum_redirects', 5);
+  config_set('services.settings', 'user_cancel_method', 'user_cancel_block');
+  config_set('services.settings', 'user_failed_login_identifier_uid_only', FALSE);
+  config_set('services.settings', 'user_failed_login_ip_limit', 50);
+  config_set('services.settings', 'user_failed_login_ip_window', 3600);
+  config_set('services.settings', 'user_failed_login_ip_window', 3600);
+  config_set('services.settings', 'user_failed_login_ip_window', 3600);
+  config_set('services.settings', 'user_failed_login_user_limit', 5);
+  config_set('services.settings', 'user_failed_login_user_window', 21600);
+  config_set('services.settings', 'user_failed_login_user_window', 21600);
+  config_set('services.settings', 'user_failed_login_user_window', 21600);
+
 }
 /**
  * Implements hook_uninstall().
@@ -188,121 +227,4 @@ function services_uninstall() {
   variable_del('services_use_sessid');
   variable_del('services_debug');
   variable_del('services_auth_module');
-}
-
-/**
- * Update 7301 adds debugging to each endopint to facilitate easier development
- */
-function services_update_7301() {
-  $table = 'services_endpoint';
-  foreach (array('debug' => 0, 'status' => 1) as $field => $value) {
-    if (!db_field_exists($table, $field)) {
-      db_add_field($table, $field, array('type' => 'int', 'not null' => TRUE, 'default' => $value));
-    }
-  }
-}
-
-/**
- * Update 7302 restores the usage of Chaos tools to check for enable/disable-status
- */
-function services_update_7302() {
-  $table = 'services_endpoint';
-  if (db_field_exists($table, 'status')) {
-    db_drop_field($table, 'status');
-  }
-}
-
-/**
- * Update 7303 adds the possibility to configure server settings on a per-endpoint basis.
- * and sets upgrades all new servers to have at least services session enabled.
- */
-function services_update_7303() {
-  // Add the new server settings field.
-  if (!db_field_exists('services_endpoint', 'server_settings')) {
-    db_add_field('services_endpoint', 'server_settings', array(
-      'description'    => 'The server settings for the endpoint.',
-      'type' => 'blob',
-      'size' => 'big',
-      'not null' => TRUE,
-      'serialize' => TRUE,
-      'initial' => '',
-    ));
-  }
-  // Fetch all endpoints that currently exist
-  $result = db_select('services_endpoint', 'se')
-    ->fields('se')
-    ->execute()
-    ->fetchAll();
-  // Loop through every endpoint and update the authentication section.
-  // Note, this will not remove previous authentication settings, it will
-  // only add to them.
-  foreach($result as $services_endpoint_object) {
-    $new_authentication = array(
-      'services' => 'services',
-    );
-    $unserial_endpoint_settings = unserialize($services_endpoint_object->authentication);
-    db_update('services_endpoint')
-      ->fields(array('authentication' => serialize(array_merge($unserial_endpoint_settings, $new_authentication))))
-      ->condition('eid',  $services_endpoint_object->eid)
-      ->execute();
-  }
-}
-/**
- * Update 7304 removes the title as it is no longer used
- */
-function services_update_7399() {
-  $table = 'services_endpoint';
-  if (db_field_exists($table, 'title')) {
-    db_drop_field($table, 'title');
-  }
-}
-
-/**
- * Update 7400 reduces nesting in the way server settings are stored
- */
-function services_update_7400() {
-  module_load_include('module','services');
-  $server_names = array_keys(services_get_servers());
-  foreach (services_endpoint_load_all() as $endpoint) {
-    $settings = $endpoint->server_settings;
-    if (!empty($settings)) {
-      if (in_array(key($settings), $server_names)) {
-        $settings = current($settings);
-      }
-    }
-    else {
-      $settings = array();
-    }
-    $endpoint->server_settings = $settings;
-    services_endpoint_save($endpoint);
-  }
-}
-/**
- * Update 7402 adds services_user table so that services can see users created/update by itself.
- */
-function services_update_7402() {
-  $schema['services_user'] = array(
-    'description' => 'Stores users created/updated by services.',
-    'fields' => array(
-      'uid' => array(
-        'type'        => 'int',
-        'description' => 'User id that has been created by Drupal',
-        'unsigned'    => TRUE,
-        'not null'    => TRUE,
-      ),
-      'created' => array(
-        'description' => 'The Unix timestamp when the node was most recently created by services.',
-        'type' => 'int',
-        'not null' => TRUE,
-        'default' => 0,
-      ),
-      'changed' => array(
-        'description' => 'The Unix timestamp when the user was most recently updated by services.',
-        'type' => 'int',
-        'not null' => TRUE,
-        'default' => 0,
-      ),
-    ),
-  );
-  db_create_table('services_user', $schema['services_user']);
 }

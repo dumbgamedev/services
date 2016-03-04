@@ -21,7 +21,6 @@ class ServicesResourceCommentTests extends ServicesWebTestCase {
    */
   public function setUp() {
     parent::setUp(
-      'ctools',
       'services',
       'rest_server'
     );
@@ -29,8 +28,8 @@ class ServicesResourceCommentTests extends ServicesWebTestCase {
     $this->endpoint =  $this->saveNewEndpoint();
 
     // Create and log in our privileged user.
-    $this->privileged_user = $this->drupalCreateUser();
-    $this->drupalLogin($this->privileged_user);
+    $this->privileged_user = $this->backdropCreateUser();
+    $this->backdropLogin($this->privileged_user);
   }
 
   /**
@@ -45,18 +44,18 @@ class ServicesResourceCommentTests extends ServicesWebTestCase {
   }
   public function testCommentIndex() {
     // Create and log in our privileged user.
-    $this->privilegedUser = $this->drupalCreateUser(array(
+    $this->privilegedUser = $this->backdropCreateUser(array(
       'administer services',
       'administer comments',
     ));
-    $this->drupalLogin($this->privilegedUser);
+    $this->backdropLogin($this->privilegedUser);
 
 
     // Create a set of comments. The comment resource returns 20 comments at a time,
     // so we create two pages and a half worth.
     $comments = array();
     $count = 50;
-    $node = $this->drupalCreateNode();
+    $node = $this->backdropCreateNode();
     $nid = $node->nid;
     for ($i = 0; $i < $count; $i++) {
       $comment = (object)$this->getCommentValues($nid);
@@ -99,7 +98,7 @@ class ServicesResourceCommentTests extends ServicesWebTestCase {
    * Test create comment.
    */
   public function testCommentCreate() {
-    $node = $this->drupalCreateNode();
+    $node = $this->backdropCreateNode();
 
     // Create comment.
     $comment = $this->getCommentValues($node->nid);
@@ -143,10 +142,10 @@ class ServicesResourceCommentTests extends ServicesWebTestCase {
    * Test create comment (Legacy).
    *
    * TODO: To be removed in future version.
-   * @see http://drupal.org/node/1083242
+   * @see http://backdrop.org/node/1083242
    */
   public function testCommentCreateLegacy() {
-    $node = $this->drupalCreateNode();
+    $node = $this->backdropCreateNode();
 
     // Create comment.
     $comment = $this->getCommentValues($node->nid);
@@ -194,7 +193,7 @@ class ServicesResourceCommentTests extends ServicesWebTestCase {
     $path = $this->endpoint->path;
 
     // Create node.
-    $node = $this->drupalCreateNode();
+    $node = $this->backdropCreateNode();
 
     $comment_args = $this->getCommentValues($node->nid);
 
@@ -220,13 +219,13 @@ class ServicesResourceCommentTests extends ServicesWebTestCase {
    */
   function testCommentUpdate() {
     $path = $this->endpoint->path;
-    $this->privilegedUser = $this->drupalCreateUser(array(
+    $this->privilegedUser = $this->backdropCreateUser(array(
       'administer services',
       'administer comments',
     ));
-    $this->drupalLogin($this->privilegedUser);
+    $this->backdropLogin($this->privilegedUser);
     // Create node.
-    $node = $this->drupalCreateNode();
+    $node = $this->backdropCreateNode();
 
     $comment_args = $this->getCommentValues($node->nid);
 
@@ -256,17 +255,17 @@ class ServicesResourceCommentTests extends ServicesWebTestCase {
    * Test update method.
    *
    * TODO: To be removed in future version.
-   * @see http://drupal.org/node/1083242
+   * @see http://backdrop.org/node/1083242
    */
   function testCommentUpdateLegacy() {
     $path = $this->endpoint->path;
-    $this->privilegedUser = $this->drupalCreateUser(array(
+    $this->privilegedUser = $this->backdropCreateUser(array(
       'administer services',
       'administer comments',
     ));
-    $this->drupalLogin($this->privilegedUser);
+    $this->backdropLogin($this->privilegedUser);
     // Create node.
-    $node = $this->drupalCreateNode();
+    $node = $this->backdropCreateNode();
 
     $comment_args = $this->getCommentValues($node->nid);
 
@@ -297,13 +296,13 @@ class ServicesResourceCommentTests extends ServicesWebTestCase {
    */
   function testCommentDelete() {
     $path = $this->endpoint->path;
-    $this->privilegedUser = $this->drupalCreateUser(array(
+    $this->privilegedUser = $this->backdropCreateUser(array(
       'administer services',
       'administer comments',
     ));
-    $this->drupalLogin($this->privilegedUser);
+    $this->backdropLogin($this->privilegedUser);
     // Create node with commenting.
-    $node = $this->drupalCreateNode();
+    $node = $this->backdropCreateNode();
 
     $comment_args = $this->getCommentValues($node->nid);
 
@@ -328,7 +327,7 @@ class ServicesResourceCommentTests extends ServicesWebTestCase {
     $path = $this->endpoint->path;
     // Generate comments.
     $settings = array('comment' => 1);
-    $node = $this->drupalCreateNode($settings);
+    $node = $this->backdropCreateNode($settings);
     for ($i = 0; $i < 5; $i++) {
       $comment = (object)$this->getCommentValues($node->nid);
       comment_save($comment);
@@ -344,7 +343,7 @@ class ServicesResourceCommentTests extends ServicesWebTestCase {
   function testCommentCountNew() {
     $path = $this->endpoint->path;
     // Generate comments.
-    $node = $this->drupalCreateNode();
+    $node = $this->backdropCreateNode();
     $nid = $node->nid;
     for ($i = 0; $i < 5; $i++) {
       $comment = (object)$this->getCommentValues($nid);

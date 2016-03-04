@@ -7,7 +7,7 @@
 
 /**
  * THERE SHOULD BE NO UPDATE!!!
- * Drupal doesn't allow updating or replacing a file in the files table.
+ * Backdrop doesn't allow updating or replacing a file in the files table.
  * If you need to, create a new file and remove the old file.
  */
 function _file_resource_definition() {
@@ -115,7 +115,7 @@ function _file_resource_definition() {
               'optional' => TRUE,
               'type' => 'int',
               'description' => 'Number of records to get per page.',
-              'default value' => variable_get('services_file_index_page_size', 20),
+              'default value' => config_get('services.settings', 'services_file_index_page_size'),
               'source' => array('param' => 'pagesize'),
             ),
             array(
@@ -174,7 +174,7 @@ function _file_resource_create($file) {
     ? file_default_scheme() . '://' . _services_file_check_destination($file['filename'])
     : _services_file_check_destination_uri($file['filepath']);
 
-  $dir = drupal_dirname($destination);
+  $dir = backdrop_dirname($destination);
   // Build the destination folder tree if it doesn't already exists.
   if (!file_prepare_directory($dir, FILE_CREATE_DIRECTORY)) {
     return services_error(t("Could not create destination directory for file."), 500);
@@ -260,7 +260,7 @@ function _file_resource_retrieve($fid, $include_file_contents, $get_image_style)
     $file->target_uri = file_uri_target($file->uri);
 
     if ($include_file_contents) {
-      $file->file = base64_encode(file_get_contents(drupal_realpath($filepath)));
+      $file->file = base64_encode(file_get_contents(backdrop_realpath($filepath)));
     }
 
     $file->image_styles = array();

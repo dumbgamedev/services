@@ -103,8 +103,8 @@
  *       this particular argument if no argument value is passed
  *
  *   A detailed example of creating a new resource can be found at
- *   http://drupal.org/node/783460 and more information about how
- *   REST resources are managed can be found at http://drupal.org/node/783254.
+ *   http://backdrop.org/node/783460 and more information about how
+ *   REST resources are managed can be found at http://backdrop.org/node/783254.
  */
 function hook_services_resources() {
 $node_resource = array(
@@ -213,7 +213,7 @@ $node_resource = array(
               'optional' => TRUE,
               'type' => 'int',
               'description' => 'Number of records to get per page.',
-              'default value' => variable_get('services_node_index_page_size', 20),
+              'default value' => config_get('services.settings', 'services_node_index_page_size'),
               'source' => array('param' => 'pagesize'),
             ),
           ),

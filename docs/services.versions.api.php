@@ -6,7 +6,7 @@
 
 /*
  * All functions that want to be considered for updates need to use a specific naming convention
- * We took the same approach as the standard Drupal hook_update methods. The pattern of update functions is
+ * We took the same approach as the standard Backdrop hook_update methods. The pattern of update functions is
  * _{RESOURCE_NAME}_resource_{METHOD_NAME}_update_{MAJOR_VERSION}_{MINOR_VERSION}
  * @see services_get_updates() for exact regular expression used.
  *

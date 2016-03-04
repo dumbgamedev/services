@@ -119,7 +119,7 @@ function _comment_resource_definition() {
               'optional' => TRUE,
               'type' => 'int',
               'description' => 'Number of records to get per page.',
-              'default value' => variable_get('services_comment_index_page_size', 20),
+              'default value' => config_get('services.settings', 'services_comment_index_page_size'),
               'source' => array('param' => 'pagesize'),
             ),
             array(
@@ -207,7 +207,7 @@ function _comment_resource_create($comment) {
   }
 
   $form_state['values'] = $comment;
-  $form_state['values']['op'] = variable_get('services_comment_save_button_resource_create', t('Save'));
+  $form_state['values']['op'] = config_get('services.settings', 'services_comment_save_button_resource_create');
 
   $comment_empty = array(
     'nid' => $comment['nid'],
@@ -221,7 +221,7 @@ function _comment_resource_create($comment) {
 
   $comment_empty = (object) $comment_empty;
   $form_state['programmed_bypass_access_check'] = FALSE;
-  $ret = drupal_form_submit('comment_form', $form_state, $comment_empty);
+  $ret = backdrop_form_submit('comment_form', $form_state, $comment_empty);
 
   // Error if needed.
   if ($errors = form_get_errors()) {
@@ -276,11 +276,11 @@ function _comment_resource_update($cid, $comment) {
   // Setup form_state.
   $form_state = array();
   $form_state['values'] = $comment;
-  $form_state['values']['op'] = variable_get('services_comment_save_button_resource_update', t('Save'));
+  $form_state['values']['op'] = config_get('services.settings', 'services_comment_save_button_resource_update');
   $form_state['comment'] = $old_comment;
   $form_state['programmed_bypass_access_check'] = FALSE;
   
-  drupal_form_submit('comment_form', $form_state, $old_comment);
+  backdrop_form_submit('comment_form', $form_state, $old_comment);
 
   if ($errors = form_get_errors()) {
     return services_error(implode(" ", $errors), 406, array('form_errors' => $errors));

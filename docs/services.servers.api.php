@@ -40,7 +40,7 @@ function hook_server_info() {
  */
 function hook_server() {
   $endpoint_path = services_get_server_info('endpoint_path', 'services/rest');
-  $canonical_path = trim(drupal_substr($_GET['q'], drupal_strlen($endpoint_path)), '/');
+  $canonical_path = trim(backdrop_substr($_GET['q'], backdrop_strlen($endpoint_path)), '/');
   $canonical_path = explode('/', $_GET['q']);
   $endpoint_path_count = count(explode('/', $endpoint_path));
   for ($x = 0; $x < $endpoint_path_count; $x++) {

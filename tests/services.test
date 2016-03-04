@@ -1,6 +1,6 @@
 <?php
 
-class ServicesWebTestCase extends DrupalWebTestCase {
+class ServicesWebTestCase extends BackdropWebTestCase {
 
   public function setUp() {
     $modules = func_get_args();
@@ -9,12 +9,12 @@ class ServicesWebTestCase extends DrupalWebTestCase {
     }
 
     // Add the required module dependencies.
-    array_unshift($modules, 'ctools', 'services', 'rest_server');
+    array_unshift($modules, 'services', 'rest_server');
 
     parent::setUp($modules);
     // Use a cookie file, so login sessions will survive, even if we
     // reinitialize Curl.
-    $this->cookieFile = drupal_tempnam(variable_get('file_temporary_path'), 'services_cookiejar');
+    $this->cookieFile = backdrop_tempnam(config_get('services.settings', 'file_temporary_path'), 'services_cookiejar');
     // Load the cookie file when initializing Curl.
     $this->additionalCurlOptions[CURLOPT_COOKIEFILE] = $this->cookieFile;
   }
@@ -62,7 +62,7 @@ class ServicesWebTestCase extends DrupalWebTestCase {
     $post = $additional_arguments;
     $i = 0;
     foreach ($filepath as $path) {
-      $post['files[file_contents' . $i . ']'] = '@' . variable_get('file_public_path', '') . '/' . file_uri_target($path);
+      $post['files[file_contents' . $i . ']'] = '@' . config_get('services.settings', 'file_public_path') . '/' . file_uri_target($path);
       $i++;
     }
 
@@ -101,7 +101,7 @@ class ServicesWebTestCase extends DrupalWebTestCase {
         // Otherwise Services will reject arguments.
         $headers[] = "Content-type: application/x-www-form-urlencoded";
         // Prepare arguments.
-        $post = drupal_http_build_query($data, '', '&');
+        $post = backdrop_http_build_query($data, '', '&');
         break;
       case 'json':
         // Add .json to get json encoded response.
@@ -146,7 +146,7 @@ class ServicesWebTestCase extends DrupalWebTestCase {
         // Otherwise Services will reject arguments.
         $headers[] = "Content-type: application/x-www-form-urlencoded";
         // Prepare arguments.
-        $post = drupal_http_build_query($data, '', '&');
+        $post = backdrop_http_build_query($data, '', '&');
         break;
       case 'json':
         // Add .json to get json encoded response.
@@ -170,7 +170,7 @@ class ServicesWebTestCase extends DrupalWebTestCase {
       CURLOPT_HEADER => TRUE,
       CURLOPT_HTTPHEADER => $headers,
       CURLOPT_INFILE => $putData,
-      CURLOPT_INFILESIZE => drupal_strlen($post)
+      CURLOPT_INFILESIZE => backdrop_strlen($post)
     ));
     fclose($putData);
 
@@ -249,12 +249,12 @@ class ServicesWebTestCase extends DrupalWebTestCase {
    */
   function parseHeader($content, $call_type = 'php') {
     $info = curl_getinfo($this->curlHandle);
-    $header = drupal_substr($content, 0, $info['header_size']);
+    $header = backdrop_substr($content, 0, $info['header_size']);
     $header = str_replace("HTTP/1.1 100 Continue\r\n\r\n", '', $header);
     $status = strtok($header, "\r\n");
     $code = $info['http_code'];
 
-    $raw_body = drupal_substr($content, $info['header_size'], drupal_strlen($content) - $info['header_size']);
+    $raw_body = backdrop_substr($content, $info['header_size'], backdrop_strlen($content) - $info['header_size']);
     switch ($call_type) {
       case 'php':
         $body = unserialize($raw_body);
@@ -272,7 +272,7 @@ class ServicesWebTestCase extends DrupalWebTestCase {
    * @param array $headers
    */
   function addCSRFHeader(&$headers) {
-    $csrf_token = $this->drupalGet('services/session/token');
+    $csrf_token = $this->backdropGet('services/session/token');
     $headers[] = 'X-CSRF-Token: ' . $csrf_token;
   }
 
@@ -791,7 +791,7 @@ class ServicesWebTestCase extends DrupalWebTestCase {
     // fragment in the request to the server, causing some web servers
     // to reject the request citing "400 - Bad Request". To prevent
     // this, we strip the fragment from the request.
-    // TODO: Remove this for Drupal 8, since fixed in curl 7.20.0.
+    // TODO: Remove this for Backdrop 8, since fixed in curl 7.20.0.
     if (!empty($curl_options[CURLOPT_URL]) && strpos($curl_options[CURLOPT_URL], '#')) {
       $original_url = $curl_options[CURLOPT_URL];
       $curl_options[CURLOPT_URL] = strtok($curl_options[CURLOPT_URL], '#');
@@ -824,18 +824,18 @@ class ServicesWebTestCase extends DrupalWebTestCase {
     // letting cURL handle redirects we take of them ourselves to
     // to prevent fragments being sent to the web server as part
     // of the request.
-    // TODO: Remove this for Drupal 8, since fixed in curl 7.20.0.
-    if (in_array($status, array(300, 301, 302, 303, 305, 307)) && $this->redirect_count < variable_get('simpletest_maximum_redirects', 5)) {
-      if ($this->drupalGetHeader('location')) {
+    // TODO: Remove this for Backdrop 8, since fixed in curl 7.20.0.
+    if (in_array($status, array(300, 301, 302, 303, 305, 307)) && $this->redirect_count < config_get('services.settings', 'simpletest_maximum_redirects')) {
+      if ($this->backdropGetHeader('location')) {
         $this->redirect_count++;
         $curl_options = array();
-        $curl_options[CURLOPT_URL] = $this->drupalGetHeader('location');
+        $curl_options[CURLOPT_URL] = $this->backdropGetHeader('location');
         $curl_options[CURLOPT_HTTPGET] = TRUE;
         return $this->curlExec($curl_options, TRUE);
       }
     }
 
-    $this->drupalSetContent($content, isset($original_url) ? $original_url : curl_getinfo($this->curlHandle, CURLINFO_EFFECTIVE_URL));
+    $this->backdropSetContent($content, isset($original_url) ? $original_url : curl_getinfo($this->curlHandle, CURLINFO_EFFECTIVE_URL));
 
     // Analyze the method for log message.
     $method = '';
@@ -858,11 +858,11 @@ class ServicesWebTestCase extends DrupalWebTestCase {
       '!method' => $method,
       '@url' => isset($original_url) ? $original_url : $url,
       '@status' => $status,
-      '!length' => format_size(drupal_strlen($this->drupalGetContent()))
+      '!length' => format_size(backdrop_strlen($this->backdropGetContent()))
     );
     $message = format_string('!method @url returned @status (!length).', $message_vars);
-    $this->assertTrue($this->drupalGetContent() !== FALSE, $message, 'Browser');
-    return $this->drupalGetContent();
+    $this->assertTrue($this->backdropGetContent() !== FALSE, $message, 'Browser');
+    return $this->backdropGetContent();
   }
     /**
    * Default values of comment for creating.

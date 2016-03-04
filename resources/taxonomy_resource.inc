@@ -115,7 +115,7 @@ function _taxonomy_resource_definition() {
               'optional' => TRUE,
               'type' => 'int',
               'description' => 'Number of records to get per page.',
-              'default value' => variable_get('services_taxonomy_term_index_page_size', 20),
+              'default value' => config_get('services.settings', ('services_taxonomy_term_index_page_size'),
               'source' => array('param' => 'pagesize'),
             ),
             array(
@@ -153,7 +153,7 @@ function _taxonomy_resource_definition() {
             array(
               'name'         => 'pager',
               'type'         => 'int',
-              'description'  => t('Whether the nodes are to be used with a pager (the case on most Drupal pages) or not (in an XML feed, for example).'),
+              'description'  => t('Whether the nodes are to be used with a pager (the case on most Backdrop pages) or not (in an XML feed, for example).'),
               'source'       => array('data' => 'pager'),
               'optional'     => TRUE,
               'default value'=> TRUE,
@@ -281,7 +281,7 @@ function _taxonomy_resource_definition() {
               'optional' => TRUE,
               'type' => 'int',
               'description' => 'Number of records to get per page.',
-              'default value' => variable_get('services_taxonomy_vocabulary_index_page_size', 20),
+              'default value' => config_get('services.settings', ('services_taxonomy_vocabulary_index_page_size'),
               'source' => array('param' => 'pagesize'),
             ),
             array(
@@ -450,7 +450,7 @@ function _taxonomy_vocabulary_resource_retrieve($vid) {
  * Create a new taxonomy vocabulary based on submitted values.
  *
  * Here is a sample vocabulary array, taken from
- * http://drupaldeveloper.in/article/programmatically-create-vocabulary
+ * http://backdropdeveloper.in/article/programmatically-create-vocabulary
  *
  * @code
  * $vocabulary = array(

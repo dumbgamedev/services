@@ -11,7 +11,6 @@ class ServicesSecurityTests extends ServicesWebTestCase {
    */
   public function setUp() {
     parent::setUp(
-      'ctools',
       'services',
       'rest_server'
     );
@@ -19,8 +18,8 @@ class ServicesSecurityTests extends ServicesWebTestCase {
     $this->endpoint = $this->saveNewEndpoint();
 
     // Create and log in our privileged user.
-    $this->privileged_user = $this->drupalCreateUser(array('get a system variable', 'set a system variable'));
-    $this->drupalLogin($this->privileged_user);
+    $this->privileged_user = $this->backdropCreateUser(array('get a system variable', 'set a system variable'));
+    $this->backdropLogin($this->privileged_user);
   }
 
   /**
@@ -48,7 +47,7 @@ class ServicesSecurityTests extends ServicesWebTestCase {
     $response = $this->servicesPostNoCSRFHeader($this->endpoint->path . '/system/get_variable', $get_variable_args, $bad_csrf_token_headers);
     $this->assertEqual($response['status'], 'HTTP/1.1 401 Unauthorized : CSRF validation failed');
 
-    $csrf_token = $this->drupalGet('services/session/token');
+    $csrf_token = $this->backdropGet('services/session/token');
     $good_csrf_token_headers = array('X-CSRF-Token: ' . $csrf_token);
     $response = $this->servicesPostNoCSRFHeader($this->endpoint->path . '/system/get_variable', $get_variable_args, $good_csrf_token_headers);
     $this->assertEqual($response['body'], $variable_value, 'Value of variable retrieved.');
@@ -65,7 +64,7 @@ class ServicesSecurityTests extends ServicesWebTestCase {
         // Otherwise Services will reject arguments.
         $headers[] = "Content-type: application/x-www-form-urlencoded";
         // Prepare arguments.
-        $post = drupal_http_build_query($data, '', '&');
+        $post = backdrop_http_build_query($data, '', '&');
         break;
       case 'json':
         // Add .json to get json encoded response.

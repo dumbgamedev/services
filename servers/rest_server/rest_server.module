@@ -23,7 +23,7 @@ function rest_server_server_info() {
 function rest_server_server() {
   $endpoint_path = services_get_server_info('endpoint_path', 'services/rest');
 
-  $services_rest_server_factory = variable_get('services_rest_server_factory_class', 'ServicesRESTServerFactory');
+  $services_rest_server_factory = config_get('services.settings', 'services_rest_server_factory_class');
   $rest_server_factory = new $services_rest_server_factory(array('endpoint_path' => $endpoint_path));
   /* @var $rest_server RESTServer */
   $rest_server = $rest_server_factory->getRESTServer();
@@ -65,7 +65,7 @@ function rest_server_request_parsers() {
       $parsers['application/x-yaml'] = 'ServicesParserYAML';
     }
 
-    drupal_alter('rest_server_request_parsers', $parsers);
+    backdrop_alter('rest_server_request_parsers', $parsers);
   }
   return $parsers;
 }
@@ -112,7 +112,7 @@ function rest_server_response_formatters() {
       );
     }
 
-    drupal_alter('rest_server_response_formatters', $formatters);
+    backdrop_alter('rest_server_response_formatters', $formatters);
   }
   return $formatters;
 }

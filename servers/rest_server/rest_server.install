@@ -12,7 +12,7 @@ function rest_server_requirements($phase) {
 
   // Report the version of libraries.
   if ($phase == 'runtime') {
-    drupal_load('module', 'libraries');
+    backdrop_load('module', 'libraries');
     $libraries = rest_server_libraries_info();
     foreach ($libraries as $name => $info) {
       $library = libraries_detect($name);

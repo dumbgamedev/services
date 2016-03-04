@@ -2,7 +2,7 @@
   /**
    * Add the table collapsing on the methoding overview page.
    */
-  Drupal.behaviors.resourceMenuCollapse = {
+  Backdrop.behaviors.resourceMenuCollapse = {
     attach: function (context, settings) {
       var timeout = null,
         arrowImageHTML = function(collapsed) {
@@ -41,7 +41,7 @@
    * Select/deselect all the inner checkboxes when the outer checkboxes are
    * selected/deselected.
    */
-  Drupal.behaviors.resourceSelectAll = {
+  Backdrop.behaviors.resourceSelectAll = {
     attach: function (context, settings) {
       $('td.resource-select-all').each(function () {
         var resourceName = this.id,

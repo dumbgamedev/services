@@ -49,7 +49,7 @@ function _services_build_resources($endpoint_name = '') {
     // Apply the endpoint on the services
     _services_apply_endpoint($resources, $endpoint, FALSE);
   }
-  drupal_alter('services_resources', $resources, $endpoint);
+  backdrop_alter('services_resources', $resources, $endpoint);
   // Process the resources, and collect all controllers in the process
   $controllers = array();
   $class_info = services_operation_class_info();
@@ -79,7 +79,7 @@ function _services_build_resources($endpoint_name = '') {
   }
   // This hook is deprecated and will be removed in next versions of services.
   // Use hook_services_resources_alter instead.
-  drupal_alter('services_resources_post_processing', $resources, $endpoint);
+  backdrop_alter('services_resources_post_processing', $resources, $endpoint);
 
   // Do some endpoint-dependent processing.
   if ($endpoint) {
@@ -183,7 +183,7 @@ function _services_apply_endpoint(&$resources, $endpoint, $strict = TRUE) {
 }
 
 /**
- * Supplies the resource definitions for Drupal core data
+ * Supplies the resource definitions for Backdrop core data
  *
  * @return array
  */

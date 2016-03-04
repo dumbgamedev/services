@@ -28,15 +28,14 @@ class ServicesResourceDisabledTest extends ServicesWebTestCase {
    */
   public function setUp() {
     parent::setUp(
-      'ctools',
       'services',
       'rest_server'
     );
     // Set up endpoint.
     $this->endpoint =  $this->saveNewEndpoint();
     // Set up privileged user and login.
-    $this->privileged_user = $this->drupalCreateUser(array('get a system variable', 'set a system variable'));
-    $this->drupalLogin($this->privileged_user);
+    $this->privileged_user = $this->backdropCreateUser(array('get a system variable', 'set a system variable'));
+    $this->backdropLogin($this->privileged_user);
   }
 
   /**
@@ -92,6 +91,6 @@ class ServicesResourceDisabledTest extends ServicesWebTestCase {
     // Call as authenticated user.
     $response = $this->servicesPost($path . '/system/connect');
     $this->assertEqual($response['code'], 404, format_string('Services returned not found response code for disabled resource: %code.', array('%code' => $response['code'])));
-    $this->drupalLogout();
+    $this->backdropLogout();
   }
 }

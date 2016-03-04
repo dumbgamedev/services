@@ -113,7 +113,7 @@ function _node_resource_definition() {
               'optional' => TRUE,
               'type' => 'int',
               'description' => 'Number of records to get per page.',
-              'default value' => variable_get('services_node_index_page_size', 20),
+              'default value' => config_get('services.settings', 'services_node_index_page_size'),
               'source' => array('param' => 'pagesize'),
             ),
             array(
@@ -280,7 +280,7 @@ function _node_resource_retrieve($nid) {
 /**
  * Creates a new node based on submitted values.
  *
- * Note that this function uses drupal_form_submit() to create new nodes,
+ * Note that this function uses backdrop_form_submit() to create new nodes,
  * which may require very specific formatting. The full implications of this
  * are beyond the scope of this comment block. The Googles are your friend.
  *
@@ -290,7 +290,7 @@ function _node_resource_retrieve($nid) {
  *   An associative array contained the new node's nid and, if applicable,
  *   the fully qualified URI to this resource.
  *
- * @see drupal_form_submit()
+ * @see backdrop_form_submit()
  */
 function _node_resource_create($node) {
   global $user;
@@ -309,7 +309,7 @@ function _node_resource_create($node) {
   // so code below won't be executed.
   _node_resource_validate_type($node);
 
-  // Load the required includes for drupal_form_submit
+  // Load the required includes for backdrop_form_submit
   module_load_include('inc', 'node', 'node.pages');
 
   $node_type = $node['type'];
@@ -317,7 +317,7 @@ function _node_resource_create($node) {
   // Setup form_state
   $form_state = array();
   $form_state['values'] = $node;
-  $form_state['values']['op'] = variable_get('services_node_save_button_' . $node_type . '_resource_create', t('Save'));
+  $form_state['values']['op'] = config_get('services.settings', 'services_node_save_button_' . $node_type . '_resource_create');
   $form_state['programmed_bypass_access_check'] = FALSE;
 
   // Build a stub node object for the form in a similar way as node_add() does,
@@ -330,10 +330,10 @@ function _node_resource_create($node) {
   // Contributed modules may check the triggering element in the form state.
   // The triggering element is usually set from the browser's POST request, so
   // we'll automatically set it as the submit action from here.
-  $stub_form = drupal_get_form($node_type . '_node_form', (object) $stub_node);
+  $stub_form = backdrop_get_form($node_type . '_node_form', (object) $stub_node);
   $form_state['triggering_element'] = $stub_form['actions']['submit'];
 
-  drupal_form_submit($node_type . '_node_form', $form_state, (object)$stub_node);
+  backdrop_form_submit($node_type . '_node_form', $form_state, (object)$stub_node);
 
   if ($errors = form_get_errors()) {
     return services_error(implode(" ", $errors), 406, array('form_errors' => $errors));
@@ -365,7 +365,7 @@ function _node_resource_validate_type($node) {
   if (!isset($types[$node_type])) {
     return services_error(t('Node type @type does not exist.', array('@type' => $node_type)), 406);
   }
-  $allowed_node_types = variable_get('services_allowed_create_content_types', $types);
+  $allowed_node_types = config_get('services.settings', 'services_allowed_create_content_types');
   if (!isset($allowed_node_types[$node_type])) {
     return services_error(t("This node type @type can't be processed via services", array('@type' => $node_type)), 406);
   }
@@ -374,7 +374,7 @@ function _node_resource_validate_type($node) {
 /**
  * Updates a new node based on submitted values.
  *
- * Note that this function uses drupal_form_submit() to create new nodes,
+ * Note that this function uses backdrop_form_submit() to create new nodes,
  * which may require very specific formatting. The full implications of this
  * are beyond the scope of this comment block. The Googles are your friend.
  *
@@ -385,7 +385,7 @@ function _node_resource_validate_type($node) {
  * @return
  *   The node's nid.
  *
- * @see drupal_form_submit()
+ * @see backdrop_form_submit()
  */
 function _node_resource_update($nid, $node) {
   // Adds backwards compatability with regression fixed in #1083242
@@ -411,7 +411,7 @@ function _node_resource_update($nid, $node) {
   // so code below won't be executed.
   _node_resource_validate_type($node);
 
-  // Load the required includes for drupal_form_submit
+  // Load the required includes for backdrop_form_submit
   module_load_include('inc', 'node', 'node.pages');
 
   $node_type = $node['type'];
@@ -420,17 +420,17 @@ function _node_resource_update($nid, $node) {
   // Setup form_state.
   $form_state = array();
   $form_state['values'] = $node;
-  $form_state['values']['op'] = variable_get('services_node_save_button_' . $node_type . '_resource_update', t('Save'));
+  $form_state['values']['op'] = config_get('services.settings', 'services_node_save_button_' . $node_type . '_resource_update');
   $form_state['node'] = $old_node;
   $form_state['programmed_bypass_access_check'] = FALSE;
 
   // Contributed modules may check the triggering element in the form state.
   // The triggering element is usually set from the browser's POST request, so
   // we'll automatically set it as the submit action from here.
-  $stub_form = drupal_get_form($node_type . '_node_form', (object) $old_node);
+  $stub_form = backdrop_get_form($node_type . '_node_form', (object) $old_node);
   $form_state['triggering_element'] = $stub_form['actions']['submit'];
 
-  drupal_form_submit($node_type . '_node_form', $form_state, $old_node);
+  backdrop_form_submit($node_type . '_node_form', $form_state, $old_node);
 
   if ($errors = form_get_errors()) {
     return services_error(implode(" ", $errors), 406, array('form_errors' => $errors));

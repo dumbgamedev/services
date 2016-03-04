@@ -130,12 +130,12 @@ function _services_controller_execute_preserve_user_switch_anonymous($controller
   $preserve_session = !is_string($controller['callback']) || (strpos($controller['callback'], 'login') === FALSE && strpos($controller['callback'], 'logout') === FALSE);
   services_set_server_info('preserve_session', $preserve_session);
   if ($preserve_session) {
-    $original_session_state = drupal_save_session();
+    $original_session_state = backdrop_save_session();
     services_set_server_info('original_session_state', $original_session_state);
-    drupal_save_session(FALSE);
+    backdrop_save_session(FALSE);
   }
 
-  $user = drupal_anonymous_user();
+  $user = backdrop_anonymous_user();
   $user->timestamp = time();
 }
 
@@ -145,7 +145,7 @@ function _services_controller_execute_restore_user() {
     $original_session_state = services_get_server_info('original_session_state');
     global $user;
     $user = $original_user;
-    drupal_save_session($original_session_state);
+    backdrop_save_session($original_session_state);
   }
 }
 
@@ -169,8 +169,8 @@ function _services_controller_execute_internals($controller, $args, $options) {
   _services_run_access_callback($controller, $args);
 
   $endpoint_path = services_get_server_info('endpoint_path', '');
-  $endpoint_path_len = drupal_strlen($endpoint_path) + 1;
-  $canonical_path = drupal_substr($_GET['q'], $endpoint_path_len, drupal_strlen($_GET['q']) - $endpoint_path_len);
+  $endpoint_path_len = backdrop_strlen($endpoint_path) + 1;
+  $canonical_path = backdrop_substr($_GET['q'], $endpoint_path_len, backdrop_strlen($_GET['q']) - $endpoint_path_len);
 
   // Prepare $path array and $resource_name.
   $path = explode('/', $canonical_path);
@@ -192,7 +192,7 @@ function _services_controller_execute_internals($controller, $args, $options) {
   if($remove_index){
     unset($options['method']);
   }
-  drupal_alter('services_request_preprocess', $controller, $args, $options);
+  backdrop_alter('services_request_preprocess', $controller, $args, $options);
 
   // Log the arguments.
   if (!empty($server_info->debug)) {
@@ -202,7 +202,7 @@ function _services_controller_execute_internals($controller, $args, $options) {
   // Execute the controller callback.
   $result = call_user_func_array($controller['callback'], $args);
 
-  drupal_alter('services_request_postprocess', $controller, $args, $result);
+  backdrop_alter('services_request_postprocess', $controller, $args, $result);
 
   return $result;
 }
@@ -247,14 +247,14 @@ function services_authentication_info($module) {
 function services_auth_invoke($module, $method, &$arg1 = NULL, &$arg2 = NULL, &$arg3 = NULL) {
   // Get information about the auth module
   $info = services_authentication_info($module);
-  drupal_alter('services_authentication_info', $info, $module);
+  backdrop_alter('services_authentication_info', $info, $module);
   $func = $info && !empty($info[$method]) ? $info[$method] : FALSE;
   if (!$func) {
     return TRUE;
   }
 
   if (!empty($info['file'])) {
-    require_once(drupal_get_path('module', $module) . '/' . $info['file']);
+    require_once(backdrop_get_path('module', $module) . '/' . $info['file']);
   }
 
   if (is_callable($func)) {
@@ -343,11 +343,11 @@ function services_get_server_info($key, $default = NULL) {
  *  Returns the server info object.
  */
 function services_server_info_object($reset = FALSE) {
-  static $drupal_static_fast;
-  if (!isset($drupal_static_fast) || $reset) {
-    $drupal_static_fast['info'] = &drupal_static(__FUNCTION__, new stdClass());
+  static $backdrop_static_fast;
+  if (!isset($backdrop_static_fast) || $reset) {
+    $backdrop_static_fast['info'] = &backdrop_static(__FUNCTION__, new stdClass());
   }
-  return $drupal_static_fast['info'];
+  return $backdrop_static_fast['info'];
 }
 
 /**

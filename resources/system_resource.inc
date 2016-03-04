@@ -16,7 +16,7 @@ function _system_resource_definition() {
           'callback' => '_system_resource_connect',
         ),
         'get_variable' => array(
-          'help'   => 'Returns the value of a system variable using variable_get().',
+          'help'   => 'Returns the value of a system variable using config_get() ).',
           'file' => array('type' => 'inc', 'module' => 'services', 'name' => 'resources/system_resource'),
           'callback' => 'variable_get',
           'access arguments' => array('get a system variable'),
@@ -39,9 +39,9 @@ function _system_resource_definition() {
           ),
         ),
         'set_variable' => array(
-          'help'   => 'Sets the value of a system variable using variable_set().',
+          'help'   => 'Sets the value of a system variable using config_set().',
           'file' => array('type' => 'inc', 'module' => 'services', 'name' => 'resources/system_resource'),
-          'callback' => 'variable_set',
+          'callback' => 'config_set',
           'access arguments' => array('set a system variable'),
           'access arguments append' => FALSE,
           'args' => array(
@@ -61,22 +61,22 @@ function _system_resource_definition() {
             ),
           ),
         ),
-        'del_variable' => array(
-          'help'   => 'Deletes a system variable using variable_del().',
-          'file' => array('type' => 'inc', 'module' => 'services', 'name' => 'resources/system_resource'),
-          'callback' => 'variable_del',
-          'access arguments' => array('set a system variable'),
-          'access arguments append' => FALSE,
-          'args' => array(
-            array(
-              'name' => 'name',
-              'optional' => FALSE,
-              'source' => array('data' => 'name'),
-              'description' => t('The name of the variable to delete.'),
-              'type' => 'string',
-            ),
-          ),
-        ),
+        // 'del_variable' => array(
+          // 'help'   => 'Deletes a system variable using variable_del().',
+          // 'file' => array('type' => 'inc', 'module' => 'services', 'name' => 'resources/system_resource'),
+          // 'callback' => 'variable_del',
+          // 'access arguments' => array('set a system variable'),
+          // 'access arguments append' => FALSE,
+          // 'args' => array(
+            // array(
+              // 'name' => 'name',
+              // 'optional' => FALSE,
+              // 'source' => array('data' => 'name'),
+              // 'description' => t('The name of the variable to delete.'),
+              // 'type' => 'string',
+            // ),
+          // ),
+        // ),
       ),
     ),
   );

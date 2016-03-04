@@ -22,15 +22,14 @@ class ServicesResourceSystemTests extends ServicesWebTestCase {
    */
   public function setUp() {
     parent::setUp(
-      'ctools',
       'services',
       'rest_server'
     );
     // Set up endpoint.
     $this->endpoint =  $this->saveNewEndpoint();
     // Set up privileged user and login.
-    $this->privileged_user = $this->drupalCreateUser(array('get a system variable', 'set a system variable'));
-    $this->drupalLogin($this->privileged_user);
+    $this->privileged_user = $this->backdropCreateUser(array('get a system variable', 'set a system variable'));
+    $this->backdropLogin($this->privileged_user);
   }
 
   /**
@@ -54,7 +53,7 @@ class ServicesResourceSystemTests extends ServicesWebTestCase {
     $response_user = $response['body']->user;
     $this->assertEqual($response_user->uid, $this->privileged_user->uid, 'User account received for authenticated user.', 'SystemResource: Connect');
 
-    $this->drupalLogout();
+    $this->backdropLogout();
     // Call as anonymous user.
     $response = $this->servicesPost($path . '/system/connect');
     $response_user = $response['body']->user;
@@ -69,7 +68,7 @@ class ServicesResourceSystemTests extends ServicesWebTestCase {
 
     $name = $this->randomName();
     $value = $this->randomString();
-    variable_set($name, $value);
+    config_set('services.settings', $name, $value);
 
     // Get already set variable.
     $response = $this->servicesPost($path . '/system/get_variable', array('name' => $name, 'default' => $this->randomString()));
@@ -109,7 +108,7 @@ class ServicesResourceSystemTests extends ServicesWebTestCase {
     // Set a random variable.
     $name = $this->randomName();
     $value = $this->randomString();
-    variable_set($name, $value);
+    config_set('services.settings', $name, $value);
 
     // Delete the variable via del_variable.
     $response = $this->servicesPost($path . '/system/del_variable', array('name' => $name));

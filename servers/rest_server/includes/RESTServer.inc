@@ -124,9 +124,9 @@ class RESTServer {
    * @return string
    */
   public function getCanonicalPath() {
-    // Use drupal_static so we can clear this static cache during unit testing.
+    // Use backdrop_static so we can clear this static cache during unit testing.
     // @see MockServicesRESTServerFactory constructor.
-    $canonical_path = &drupal_static('RESTServerGetCanonicalPath');
+    $canonical_path = &backdrop_static('RESTServerGetCanonicalPath');
     if (empty($canonical_path)) {
       $canonical_path = $this->context->getCanonicalPath();
       $canonical_path = $this->negotiator->getParsedCanonicalPath($canonical_path);
@@ -198,7 +198,7 @@ class RESTServer {
     }
 
     // Set the content type and render output.
-    drupal_add_http_header('Content-type', $mime_type);
+    backdrop_add_http_header('Content-type', $mime_type);
 
     return $formatter;
   }
@@ -267,10 +267,10 @@ class RESTServer {
     array_shift($path_array);
 
     $data = $this->parseRequestBody();
-    drupal_alter('rest_server_request_parsed', $data, $controller);
+    backdrop_alter('rest_server_request_parsed', $data, $controller);
 
     $headers = $this->parseRequestHeaders();
-    drupal_alter('rest_server_headers_parsed', $headers);
+    backdrop_alter('rest_server_headers_parsed', $headers);
 
     $sources = array(
       'path' => $path_array,
@@ -415,8 +415,8 @@ class RESTServer {
           $pcount = count($pm[0]);
           for ($i=0; $i<$pcount; $i++) {
             $value = $pm[2][$i];
-            if (drupal_substr($value, 0, 1) == '"') {
-              $value = stripcslashes(drupal_substr($value, 1, mb_strlen($value)-2));
+            if (backdrop_substr($value, 0, 1) == '"') {
+              $value = stripcslashes(backdrop_substr($value, 1, mb_strlen($value)-2));
             }
             $ret_val['param'][$pm[1][$i]] = $value;
           }
@@ -683,9 +683,9 @@ class RESTServer {
       'header_message' => &$error_header_status_message,
       'body_data' => &$error_data,
     );
-    drupal_alter('rest_server_execute_errors', $error_alter_array, $controller, $arguments);
+    backdrop_alter('rest_server_execute_errors', $error_alter_array, $controller, $arguments);
 
-    drupal_add_http_header('Status', strip_tags(str_replace(PHP_EOL, '', $error_header_status_message)));
+    backdrop_add_http_header('Status', strip_tags(str_replace(PHP_EOL, '', $error_header_status_message)));
 
     return $error_data;
   }

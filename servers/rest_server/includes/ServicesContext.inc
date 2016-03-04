@@ -65,8 +65,8 @@ class ServicesContext implements ServicesContextInterface {
   public function getCanonicalPath() {
     if (!isset($this->data['canonical_path'])) {
       $endpoint_path = $this->getEndpointPath();
-      $endpoint_path_len = drupal_strlen($endpoint_path . '/');
-      $this->data['canonical_path'] = drupal_substr($this->data['get']['q'], $endpoint_path_len);
+      $endpoint_path_len = backdrop_strlen($endpoint_path . '/');
+      $this->data['canonical_path'] = backdrop_substr($this->data['get']['q'], $endpoint_path_len);
     }
 
     return $this->data['canonical_path'];

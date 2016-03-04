@@ -18,15 +18,14 @@ class ServicesResourceTaxonomyTests extends ServicesWebTestCase {
    */
   public function setUp() {
     parent::setUp(
-      'ctools',
       'services',
       'rest_server'
     );
     // Set up endpoint.
     $this->endpoint =  $this->saveNewEndpoint();
     // Set up privileged user and login.
-    $this->privileged_user = $this->drupalCreateUser(array('administer taxonomy', 'access content'));
-    $this->drupalLogin($this->privileged_user);
+    $this->privileged_user = $this->backdropCreateUser(array('administer taxonomy', 'access content'));
+    $this->backdropLogin($this->privileged_user);
   }
 
   /**
@@ -41,10 +40,10 @@ class ServicesResourceTaxonomyTests extends ServicesWebTestCase {
   }
     public function testTaxonomyVocabularyIndex() {
     // Create and log in our privileged user.
-    $this->privilegedUser = $this->drupalCreateUser(array(
+    $this->privilegedUser = $this->backdropCreateUser(array(
       'administer services',
     ));
-    $this->drupalLogin($this->privilegedUser);
+    $this->backdropLogin($this->privilegedUser);
 
 
     // Create a set of taxonomy vocabularys. The taxonomy resource returns 20 vocabularys at a time,
@@ -88,10 +87,10 @@ class ServicesResourceTaxonomyTests extends ServicesWebTestCase {
   }
   public function testTaxonomyTermIndex() {
     // Create and log in our privileged user.
-    $this->privilegedUser = $this->drupalCreateUser(array(
+    $this->privilegedUser = $this->backdropCreateUser(array(
       'administer services',
     ));
-    $this->drupalLogin($this->privilegedUser);
+    $this->backdropLogin($this->privilegedUser);
 
 
     // Create a set of taxonomy terms. The taxonomy resource returns 20 terms at a time,
@@ -166,7 +165,7 @@ class ServicesResourceTaxonomyTests extends ServicesWebTestCase {
    * Test taxonomy vocabulary create method (Legacy).
    *
    * TODO: To be removed in future version.
-   * @see http://drupal.org/node/1083242
+   * @see http://backdrop.org/node/1083242
    */
   function testVocabularyCreateLegacy() {
     $path = $this->endpoint->path;
@@ -236,7 +235,7 @@ class ServicesResourceTaxonomyTests extends ServicesWebTestCase {
    * Test taxonomy vocabulary update (Legacy).
    *
    * TODO: To be removed in future version.
-   * @see http://drupal.org/node/1083242
+   * @see http://backdrop.org/node/1083242
    */
   function testVocabularyUpdateLegacy() {
     $path = $this->endpoint->path;
@@ -386,7 +385,7 @@ class ServicesResourceTaxonomyTests extends ServicesWebTestCase {
    * Test taxonomy term create method (Legacy).
    *
    * TODO: To be removed in future version.
-   * @see http://drupal.org/node/1083242
+   * @see http://backdrop.org/node/1083242
    */
   function testTermCreateLegacy() {
     $path = $this->endpoint->path;
@@ -457,7 +456,7 @@ class ServicesResourceTaxonomyTests extends ServicesWebTestCase {
    * Test taxonomy term update method (Legacy).
    *
    * TODO: To be removed in future version.
-   * @see http://drupal.org/node/1083242
+   * @see http://backdrop.org/node/1083242
    */
   function testTermUpdateLegacy() {
     $path = $this->endpoint->path;
@@ -572,34 +571,34 @@ class ServicesResourceTaxonomyTests extends ServicesWebTestCase {
 
     // Create 7 page nodes with term1 attached.
     for ($i = 0; $i < 7; $i++) {
-      $node = $this->drupalCreateNode(array($field_name => array(LANGUAGE_NONE => array(array('tid' => $term1['tid'])))));
+      $node = $this->backdropCreateNode(array($field_name => array(LANGUAGE_NONE => array(array('tid' => $term1['tid'])))));
       $nodes[$node->nid] = $node;
       $nodes_term1[] = $node->nid;
     }
 
     // Create 7 page nodes with term2 attached.
     for ($i = 0; $i < 7; $i++) {
-      $node = $this->drupalCreateNode(array($field_name => array(LANGUAGE_NONE => array(array('tid' => $term2['tid'])))));
+      $node = $this->backdropCreateNode(array($field_name => array(LANGUAGE_NONE => array(array('tid' => $term2['tid'])))));
       $nodes[$node->nid] = $node;
       $nodes_term2[] = $node->nid;
     }
 
     // Create 7 page nodes with both term1 and term2 attached.
     for ($i = 0; $i < 7; $i++) {
-      $node = $this->drupalCreateNode(array($field_name => array(LANGUAGE_NONE => array(array('tid' => $term1['tid']), array('tid' => $term2['tid'])))));
+      $node = $this->backdropCreateNode(array($field_name => array(LANGUAGE_NONE => array(array('tid' => $term1['tid']), array('tid' => $term2['tid'])))));
       $nodes[$node->nid] = $node;
       $nodes_term1_term2[] = $node->nid;
     }
 
     // Create 7 page nodes without any terms.
     for ($i = 0; $i < 7; $i++) {
-      $node = $this->drupalCreateNode();
+      $node = $this->backdropCreateNode();
       $nodes[$node->nid] = $node;
       $nodes_noterm[] = $node->nid;
     }
 
     // If pager is FALSE query is limited by 'feed_default_items' variable.
-    variable_set('feed_default_items', 100);
+    config_set('services.settings', 'feed_default_items', 100);
 
     // Select 14 nodes with term1 attached.
     $response = $this->servicesPost($path . '/taxonomy_term/selectNodes', array('tid' => $term1['tid'], 'pager' => FALSE));

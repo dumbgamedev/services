@@ -56,17 +56,17 @@ function services_security_update_reset_users_since_date() {
     ))
     ->condition('created', 1377892483, '>=')
     ->execute();
-    drupal_set_message($result . ' users were updated');
+    backdrop_set_message($result . ' users were updated');
 }
 
 function services_security_user_update_finished($success, $results, $operations) {
   if ($success) {
-    drupal_set_message(t('@count users passwords were reset.', array('@count' => count($results))));
+    backdrop_set_message(t('@count users passwords were reset.', array('@count' => count($results))));
     services_security_user_update_finish();
   }
   else {
     $error_operation = reset($operations);
-    drupal_set_message(
+    backdrop_set_message(
       t('An error occurred while processing @operation with arguments : @args',
         array(
           '@operation' => $error_operation[0],
@@ -81,10 +81,10 @@ function services_security_user_update_finished($success, $results, $operations)
  * Executes final tasks at the end of the security update follow up.
  */
 function services_security_user_update_finish() {
-  drupal_set_message('Services security update follow up is complete.');
-  variable_set('services_security_update_1', TRUE);
-  if (!drupal_is_cli()) {
-    drupal_goto('admin/reports/status');
+  backdrop_set_message('Services security update follow up is complete.');
+  config_set('services.settings', 'services_security_update_1', TRUE);
+  if (!backdrop_is_cli()) {
+    backdrop_goto('admin/reports/status');
   }
 }
 
@@ -97,7 +97,7 @@ function services_security_update_reset_users_with_password_one() {
   $num_of_users = count($users);
 
   $progress = 0; // where to start
-  $limit = variable_get('services_security_reset_limit_per_batch', 10); // how many to process for each run
+  $limit = config_get('services.settings', 'services_security_reset_limit_per_batch'); // how many to process for each run
   $max = $num_of_users; // how many records to process until stop
 
   //Set up our batch operations
@@ -110,7 +110,7 @@ function services_security_update_reset_users_with_password_one() {
   $batch = array(
     'operations' => $operations,
     'finished' => 'services_security_user_update_finished',
-    'file' => drupal_get_path('module', 'services') . '/services.admin.inc',
+    'file' => backdrop_get_path('module', 'services') . '/services.admin.inc',
     'progress_message' => t('Processed batch #@current out of @total.'),
   );
 
@@ -126,7 +126,7 @@ function services_security_update_reset_users_with_password_one_op($progress, $l
     $context['sandbox']['max'] = $limit;
   }
   // Required for user_check_password.
-  require_once DRUPAL_ROOT . '/' . variable_get('password_inc', 'includes/password.inc');
+  require_once BACKDROP_ROOT . '/' . config_get('services.settings', 'password_inc');
   //Set the password we are looking for.
   $password = "1";
   //Fetch all users in our current range.
@@ -181,10 +181,10 @@ function services_help($path, $arg) {
 
   switch ($path) {
     case 'admin/help#services':
-      $output = '<p>' . t('Visit the <a href="@handbook_url">Services Handbook</a> for help and information.', array('@handbook_url' => 'http://drupal.org/node/109782')) . '</p>';
+      $output = '<p>' . t('Visit the <a href="@handbook_url">Services Handbook</a> for help and information.', array('@handbook_url' => 'http://backdrop.org/node/109782')) . '</p>';
       break;
     case 'admin/structure/services':
-      $output = '<p>' . t('Services are collections of methods available to remote applications. They are defined in modules, and may be accessed in a number of ways through server modules. Visit the <a href="@handbook_url">Services Handbook</a> for help and information.', array('@handbook_url' => 'http://drupal.org/node/109782')) . '</p>';
+      $output = '<p>' . t('Services are collections of methods available to remote applications. They are defined in modules, and may be accessed in a number of ways through server modules. Visit the <a href="@handbook_url">Services Handbook</a> for help and information.', array('@handbook_url' => 'http://backdrop.org/node/109782')) . '</p>';
       $output .= '<p>' . t('All enabled services and methods are shown. Click on any method to view information or test.') . '</p>';
       break;
   }
@@ -272,7 +272,7 @@ function services_menu() {
     'type' => MENU_NORMAL_ITEM,
     'title' => 'Services Security update',
     'description' => 'Services module security updates',
-    'page callback' => 'drupal_get_form',
+    'page callback' => 'backdrop_get_form',
     'page arguments' => array('services_security_admin_form'),
     'access arguments' => array('administer site configuration'),
     'file' => 'services.admin.inc',
@@ -340,7 +340,7 @@ function services_theme() {
  *  the installed server implementations.
  */
 function services_get_servers($reset = FALSE) {
-  $servers = &drupal_static(__FUNCTION__);
+  $servers = &backdrop_static(__FUNCTION__);
 
   if (!$servers || $reset) {
     $servers = array();
@@ -366,8 +366,8 @@ function services_endpoint_callback($endpoint_name) {
 
   // Explicitly set the title to avoid expensive menu calls in token
   // and elsewhere.
-  if (!($title = drupal_set_title())) {
-    drupal_set_title('Services endpoint');
+  if (!($title = backdrop_set_title())) {
+    backdrop_set_title('Services endpoint');
   }
 
   $endpoint = services_endpoint_load($endpoint_name);
@@ -389,11 +389,11 @@ function services_endpoint_callback($endpoint_name) {
     print call_user_func($server . '_server');
 
     // Do not let this output
-    drupal_page_footer();
+    backdrop_page_footer();
     exit();
   }
   // return 404 if the server doesn't exist
-  drupal_not_found();
+  backdrop_not_found();
 }
 
 
@@ -557,13 +557,13 @@ function services_services_resources() {
 function services_services_authentication_info() {
   return array(
     'title'             => t('Session authentication'),
-    'description'       => t("Uses Drupal's built in sessions to authenticate."),
+    'description'       => t("Uses Backdrop's built in sessions to authenticate."),
     'authenticate_call' => '_services_sessions_authenticate_call',
   );
 }
 
 /**
- * Authenticates a call using Drupal's built in sessions
+ * Authenticates a call using Backdrop's built in sessions
  *
  * @return string
  *   Error message in case error occured.
@@ -584,7 +584,7 @@ function _services_sessions_authenticate_call($module, $controller) {
     elseif (isset($_REQUEST['services_token'])) {
       $csrf_token = $_REQUEST['services_token'];
     }
-    if ($non_safe_method_called && !drupal_valid_token($csrf_token, 'services')) {
+    if ($non_safe_method_called && !backdrop_valid_token($csrf_token, 'services')) {
       return t('CSRF validation failed');
     }
   }
@@ -697,7 +697,7 @@ function services_controller_get($name, $endpoint) {
  *   Otherwise, array().
  */
 function services_get_updates() {
-  $updates = &drupal_static(__FUNCTION__, array());
+  $updates = &backdrop_static(__FUNCTION__, array());
   if (!isset($updates) || empty($updates)) {
     $updates = array();
     module_load_include('inc', 'services', 'includes/services.resource_build');
@@ -919,7 +919,7 @@ function services_resources_as_procedures($resource, $resource_name) {
  *   Additional query options.
  */
 function services_resource_build_index_query($query, $page, $fields, $parameters, $page_size, $resource, $options = array()) {
-  $default_limit = variable_get("services_{$resource}_index_page_size", 20);
+  $default_limit = config_get('services.settings', "services_{$resource}_index_page_size");
   if (!user_access('perform unlimited index queries') && $page_size > $default_limit) {
     $page_size = $default_limit;
   }
@@ -1019,10 +1019,10 @@ function services_remove_user_data(&$account) {
     unset($account->init);
   }
 
-  drupal_alter('services_account_object', $account);
+  backdrop_alter('services_account_object', $account);
 
   // Add the full URL to the user picture, if one is present.
-  if (variable_get('user_pictures', FALSE) && isset($account->picture->uri)) {
+  if (config_get('system.core', 'user_pictures') && isset($account->picture->uri)) {
     $account->picture->url = file_create_url($account->picture->uri);
   }
 }
@@ -1057,7 +1057,7 @@ function services_field_permissions_clean($op, $entity_type, $entity) {
       $key = $entity_type;
   }
   //Allow someone to alter the field lookup key in the case they used their own entity.
-  drupal_alter('services_field_permissions_field_lookup_key', $key);
+  backdrop_alter('services_field_permissions_field_lookup_key', $key);
 
   //load the fields info
   $fields_info = field_info_instances($entity_type);
@@ -1110,7 +1110,7 @@ if (!function_exists('getallheaders')) {
  * Page callback to generate token.
  */
 function _services_session_token() {
-  drupal_add_http_header('Content-Type', 'text/plain');
-  print drupal_get_token('services');
-  drupal_exit();
+  backdrop_add_http_header('Content-Type', 'text/plain');
+  print backdrop_get_token('services');
+  backdrop_exit();
 }

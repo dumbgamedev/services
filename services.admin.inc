@@ -23,7 +23,7 @@ function services_security_form_decision($form, &$form_state) {
       $values = $form_state['storage'];
   }
   $notice = '<div style="color:red;"><strong>A Services security update mitigation step has already been run on this site.</strong></div>';
-  $services_security_update = variable_get('services_security_update_1', FALSE);
+  $services_security_update = config_get('services.settings', 'services_security_update_1');
   //If services security has not run before, lets set the notice to nothing.
   if(!$services_security_update) {
     $notice = '';
@@ -170,9 +170,9 @@ function services_security_form_decision_submit($form, &$form_state) {
 function theme_services_resource_table($variables) {
   $table = $variables['table'];
 
-  drupal_add_css(drupal_get_path('module', 'services') . '/css/services.admin.css');
-  drupal_add_js(drupal_get_path('module', 'services') . '/js/services.admin.js');
-  drupal_add_js('misc/tableselect.js');
+  backdrop_add_css(backdrop_get_path('module', 'services') . '/css/services.admin.css');
+  backdrop_add_js(backdrop_get_path('module', 'services') . '/js/services.admin.js');
+  backdrop_add_js('misc/tableselect.js');
 
   // Create header for resource selection table.
   $header = array(
@@ -219,7 +219,7 @@ function theme_services_resource_table($variables) {
       'class' => array('resource-group-description'),
     );
     $row[] = array(
-      'data' => drupal_render($element['alias']),
+      'data' => backdrop_render($element['alias']),
       'class' => array('resource-group-alias'),
     );
     $rows[] = array('data' => $row, 'class' => array('resource-group'));
@@ -258,7 +258,7 @@ function theme_services_resource_table($variables) {
           $method['#name'] = $class;
 
           $row[] = array(
-            'data' => drupal_render($method['enabled']),
+            'data' => backdrop_render($method['enabled']),
             'class' => array('resource-method-select'),
           );
           $row[] = array(
@@ -266,7 +266,7 @@ function theme_services_resource_table($variables) {
             'class' => array('resource-method-description'),
           );
           $row[] = array(
-            'data' => drupal_render($method['settings']),
+            'data' => backdrop_render($method['settings']),
             'class' => array('resource-method-settings'),
           );
           $row[] = array(
@@ -283,7 +283,7 @@ function theme_services_resource_table($variables) {
   }
 
   // Add js array of settings.
-  drupal_add_js(array('services' => $js), 'setting');
+  backdrop_add_js(array('services' => $js), 'setting');
 
   if (empty($rows)) {
     return '<strong>' . t('No resourcess to display.') . '</strong>';

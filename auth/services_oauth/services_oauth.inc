@@ -83,7 +83,7 @@ function _services_oauth_authenticate_call($settings, $method, $args) {
     }
   }
   catch (OAuthException $e) {
-    drupal_add_http_header('WWW-Authenticate', sprintf('OAuth realm="%s"', url('', array('absolute' => TRUE))));
+    backdrop_add_http_header('WWW-Authenticate', sprintf('OAuth realm="%s"', url('', array('absolute' => TRUE))));
     return $e->getMessage();
   }
 }

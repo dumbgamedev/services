@@ -23,8 +23,8 @@ class ServicesVersionTests extends ServicesWebTestCase {
   public function setUp() {
     parent::setUp('services_test_resource');
     // Set up privileged user and login.
-    $this->privileged_user = $this->drupalCreateUser(array('administer services',));
-    $this->drupalLogin($this->privileged_user);
+    $this->privileged_user = $this->backdropCreateUser(array('administer services',));
+    $this->backdropLogin($this->privileged_user);
   }
 
   /**
