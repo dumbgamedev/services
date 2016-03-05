@@ -1,69 +1,74 @@
 <?php
+
 /*
- * Plugin definition for Ctools Export UI
+ * Implements hook_services_endpoint_info().
  */
-$plugin = array(
-  'schema' => 'services_endpoint',
-  'menu' => array(
-    'menu item' => 'services',
-    'menu description' => 'Manage Services',
-    // Add services specific own menu callbacks.
-    'items' => array(
-      'resources' => array(
-        'path' => 'list/%ctools_export_ui/resources',
-        'title' => 'Resources',
-        'page callback' => 'ctools_export_ui_switcher_page',
-        'page arguments' => array('services_ctools_export_ui', 'resources', 4),
-        'load arguments' => array('services_ctools_export_ui'),
-        'access arguments' => array('administer services'),
-        'type' => MENU_LOCAL_TASK,
-        'weight' => -2,
-      ),
-      'server' => array(
-        'path' => 'list/%ctools_export_ui/server',
-        'title' => 'Server',
-        'page callback' => 'ctools_export_ui_switcher_page',
-        'page arguments' => array('services_ctools_export_ui', 'server', 4),
-        'load arguments' => array('services_ctools_export_ui'),
-        'access arguments' => array('administer services'),
-        'type' => MENU_LOCAL_TASK,
-        'weight' => -4,
-      ),
-      'authentication' => array(
-        'path' => 'list/%ctools_export_ui/authentication',
-        'title' => 'Authentication',
-        'page callback' => 'ctools_export_ui_switcher_page',
-        'page arguments' => array('services_ctools_export_ui', 'authentication', 4),
-        'load arguments' => array('services_ctools_export_ui'),
-        'access arguments' => array('administer services'),
-        'type' => MENU_LOCAL_TASK,
-        'weight' => -3,
+function _services_services_endpoint_info() {
+  $plugin = array(
+    'schema' => 'services_endpoint',
+    'menu' => array(
+      'menu item' => 'services',
+      'menu description' => 'Manage Services',
+      // Add services specific own menu callbacks.
+      'items' => array(
+        'resources' => array(
+          'path' => 'list/%ctools_export_ui/resources',
+          'title' => 'Resources',
+          'page callback' => 'ctools_export_ui_switcher_page',
+          'page arguments' => array('services_ctools_export_ui', 'resources', 4),
+          'load arguments' => array('services_ctools_export_ui'),
+          'access arguments' => array('administer services'),
+          'type' => MENU_LOCAL_TASK,
+          'weight' => -2,
+        ),
+        'server' => array(
+          'path' => 'list/%ctools_export_ui/server',
+          'title' => 'Server',
+          'page callback' => 'ctools_export_ui_switcher_page',
+          'page arguments' => array('services_ctools_export_ui', 'server', 4),
+          'load arguments' => array('services_ctools_export_ui'),
+          'access arguments' => array('administer services'),
+          'type' => MENU_LOCAL_TASK,
+          'weight' => -4,
+        ),
+        'authentication' => array(
+          'path' => 'list/%ctools_export_ui/authentication',
+          'title' => 'Authentication',
+          'page callback' => 'ctools_export_ui_switcher_page',
+          'page arguments' => array('services_ctools_export_ui', 'authentication', 4),
+          'load arguments' => array('services_ctools_export_ui'),
+          'access arguments' => array('administer services'),
+          'type' => MENU_LOCAL_TASK,
+          'weight' => -3,
+        ),
       ),
     ),
-  ),
-  // Add our custom operations.
-  'allowed operations' => array(
-    'resources'  => array('title' => t('Edit Resources')),
-    'server'  => array('title' => t('Edit Server')),
-    'authentication' => array('title' => t('Edit Authentication')),
-  ),
-  'form' => array(
-    'settings' => 'services_ctools_export_ui_form',
-    'validate' => 'services_ctools_export_ui_form_validate',
-    'submit' => 'services_ctools_export_ui_form_submit',
-  ),
-  'handler' => array(
-    'class' => 'services_ctools_export_ui',
-    'parent' => 'ctools_export_ui',
-  ),
+    // Add our custom operations.
+    'allowed operations' => array(
+      'resources'  => array('title' => t('Edit Resources')),
+      'server'  => array('title' => t('Edit Server')),
+      'authentication' => array('title' => t('Edit Authentication')),
+    ),
+    'form' => array(
+      'settings' => 'services_ctools_export_ui_form',
+      'validate' => 'services_ctools_export_ui_form_validate',
+      'submit' => 'services_ctools_export_ui_form_submit',
+    ),
+    'handler' => array(
+      'class' => 'services_ctools_export_ui',
+      'parent' => 'ctools_export_ui',
+    ),
 
-  'title' => t('Services'),
+    'title' => t('Services'),
 
-  'title singular' => t('endpoint'),
-  'title plural' => t('endpoints'),
-  'title singular proper' => t('Endpoint'),
-  'title plural proper' => t('Endpoints'),
-);
+    'title singular' => t('endpoint'),
+    'title plural' => t('endpoints'),
+    'title singular proper' => t('Endpoint'),
+    'title plural proper' => t('Endpoints'),
+  );
+
+  return $plugin;
+}
 
 /**
  * Form to edit the settings of an endpoint.

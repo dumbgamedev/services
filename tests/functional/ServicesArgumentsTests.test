@@ -20,7 +20,7 @@ class ServicesArgumentsTestCase extends ServicesWebTestCase {
   }
 
   public function setUp() {
-    parent::setUp('ctools', 'services', 'services_test_resource');
+    parent::setUp('services', 'services_test_resource');
     // Set up endpoint.
     $this->endpoint =  $this->saveNewEndpoint();
   }
