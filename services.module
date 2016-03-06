@@ -388,7 +388,7 @@ function services_endpoint_new() {
  *  The endpoint configuration.
  */
 function services_endpoint_load($name) {
-  $result = feeds_load_endpoint_object($name);
+  $result = services_load_endpoint_object($name);
   if (isset($result[$name])) {
     return $result[$name];
   }
@@ -402,7 +402,8 @@ function services_endpoint_load($name) {
  *  Array of endpoint objects keyed by endpoint names.
  */
 function services_endpoint_load_all() {
-  return feeds_load_endpoint_object();
+  dpm(services_load_endpoint_object());
+  return services_load_endpoint_object();
 }
 
 /**
@@ -421,8 +422,8 @@ function services_endpoint_save($endpoint) {
       $endpoint->{$endpoint_field} = array();
     }
   }
-  services_endpoint_save($endpoint);
-  feeds_load_endpoint_object_reset();
+  services_endpoint_crud_save($endpoint);
+  services_load_endpoint_object_reset();
   menu_rebuild();
   cache_clear_all('services:' . $endpoint->name . ':', 'cache', TRUE);
 }
@@ -433,8 +434,8 @@ function services_endpoint_save($endpoint) {
  * @return void
  */
 function services_endpoint_delete($endpoint) {
-  services_endpoint_delete($endpoint);
-  feeds_load_endpoint_object_reset('services_endpoint');
+  services_endpoint_crud_delete($endpoint);
+  services_load_endpoint_object_reset('services_endpoint');
   menu_rebuild();
   cache_clear_all('services:' . $endpoint->name . ':', 'cache', TRUE);
 }
@@ -1127,7 +1128,7 @@ function services_endpoint_new_object() {
  *   SAVED_UPDATED is returned depending on the operation performed. The
  *   $object parameter contains values for any serial fields defined by the $table
  */
-function services_endpoint_save(&$object) {
+function services_endpoint_crud_save(&$object) {
   $schema = backdrop_get_schema('services_endpoint');
   $export = $schema['export'];
 
@@ -1167,7 +1168,7 @@ function services_endpoint_save(&$object) {
  * @param $object
  *   The fully populated object to delete, or the export key.
  */
-function services_endpoint_delete($object) {
+function services_endpoint_crud_delete($object) {
   $schema = backdrop_get_schema('services_endpoint');
   $export = $schema['export'];
 
@@ -1184,7 +1185,7 @@ function services_endpoint_delete($object) {
   }
 }
 
-function feeds_load_endpoint_object($name = NULL) {
+function services_load_endpoint_object($name = NULL) {
   $table = 'services_endpoint';
 
   $cache = &backdrop_static(__FUNCTION__);
@@ -1220,7 +1221,6 @@ function feeds_load_endpoint_object($name = NULL) {
     $query->condition('name', array($name), 'IN');
   }
   $result = $query->execute();
-
   $conditions = array();
   $query_args = array();
   $status = array();
@@ -1240,11 +1240,13 @@ function feeds_load_endpoint_object($name = NULL) {
         $object->{$field_name} = $field;
       }
 
+    }
     $cache[$object->name] = $object;
   }
 
   // Todo get rid of the DB table and do all this in config
   $defaults = _services_endpoint_get_defaults($table);
+  dpm($defaults);
 
   if ($defaults) {
     foreach ($defaults as $object) {
@@ -1284,7 +1286,8 @@ function feeds_load_endpoint_object($name = NULL) {
 }
 
 function _services_endpoint_get_defaults($table) {
-  $cache = &backdrop_static(__FUNCTION__, array());
+  //$cache = &backdrop_static(__FUNCTION__, array());
+  $cache = NULL;
 
   if (!isset($cache)) {
     $cache = array();
