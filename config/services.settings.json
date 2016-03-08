@@ -21,5 +21,5 @@
     "services_user_create_button_resource_create": "Create new account",
     "services_user_index_page_size": 20,
     "services_user_save_button_resource_update": "Save",
-    "simpletest_maximum_redirects": 5,
+    "simpletest_maximum_redirects": 5
 }

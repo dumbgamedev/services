@@ -245,7 +245,7 @@ function services_menu() {
   $items = array();
   $endpoints = services_endpoint_load_all();
   foreach ($endpoints as $endpoint) {
-    if (empty($endpoint->disabled)) {
+    if (empty($endpoint->status)) {
       $items[$endpoint->path] = array(
         'title'             => 'Services endpoint',
         'access callback'   => 'services_access_menu',
@@ -255,6 +255,97 @@ function services_menu() {
       );
     }
   }
+
+  // Minor code reduction technique.
+  $base = array(
+    'access callback' => 'user_access',
+    'access arguments' => array('administer endpoints'),
+    'file' => 'services.admin.inc',
+  );
+
+  $items['admin/structure/services'] = array(
+    'title' => 'Services',
+    'description' => 'Manage customized lists of content.',
+    'page callback' => 'services_list_page',
+    'type' => MENU_NORMAL_ITEM,
+  ) + $base;
+  $items['admin/structure/services/list'] = array(
+      'title' => 'List endpoints',
+      'type' => MENU_DEFAULT_LOCAL_TASK,
+      'weight' => -1,
+    );
+
+  $items['admin/structure/services/add'] = array(
+    'title' => 'Add endpoint',
+    'page callback' => 'backdrop_get_form',
+    'page arguments' => array('services_endpoint_edit_form', NULL),
+    'type' => MENU_LOCAL_ACTION,
+  ) + $base;
+
+  // Additional pages for acting on an endpoint.
+  $items['admin/structure/services/list/%services_endpoint'] = array(
+    'title' => 'Edit endpoint',
+    'page callback' => 'backdrop_get_form',
+    'page arguments' => array('services_endpoint_edit_form', 4),
+    'type' => MENU_NORMAL_ITEM,
+    // 'context' => MENU_CONTEXT_PAGE | MENU_CONTEXT_INLINE,
+    'weight' => -10,
+  ) + $base;
+  // Additional pages for acting on an endpoint.
+  $items['admin/structure/services/list/%services_endpoint/edit'] = array(
+    'title' => 'Edit endpoint',
+    'page callback' => 'backdrop_get_form',
+    'page arguments' => array('services_endpoint_edit_form', 4),
+    'type' => MENU_DEFAULT_LOCAL_TASK,
+    // 'context' => MENU_CONTEXT_PAGE | MENU_CONTEXT_INLINE,
+    'weight' => -10,
+  ) + $base;
+  $items['admin/structure/services/list/%services_endpoint/clone'] = array(
+    'title' => 'Clone endpoint',
+    'page callback' => 'backdrop_get_form',
+    'page arguments' => array('services_endpoint_clone_form', 4),
+    'context' => MENU_CONTEXT_PAGE | MENU_CONTEXT_INLINE,
+    'type' => MENU_VISIBLE_IN_BREADCRUMB,
+  ) + $base;
+  $items['admin/structure/services/list/%services_endpoint/delete'] = array(
+    'title' => 'Delete endpoint',
+    'page callback' => 'backdrop_get_form',
+    'page arguments' => array('views_ui_delete_form', 4),
+    'access callback' => 'views_ui_menu_action_access',
+    // 'access arguments' => array(4, 'delete'),
+    'context' => MENU_CONTEXT_PAGE | MENU_CONTEXT_INLINE,
+    'type' => MENU_VISIBLE_IN_BREADCRUMB,
+  ) + $base;
+  $items['admin/structure/services/list/%services_endpoint/enable'] = array(
+      'title' => 'Enable endpoint',
+    'page callback' => 'backdrop_get_form',
+    'page arguments' => array('services_toggle_enable_page', 4),
+      'type' => MENU_VISIBLE_IN_BREADCRUMB,
+    ) + $base;
+  $items['admin/structure/services/list/%services_endpoint/disable'] = array(
+    'title' => 'Disable endpoint',
+    'page callback' => 'backdrop_get_form',
+    'page arguments' => array('services_toggle_enable_page', 4),
+    'type' => MENU_VISIBLE_IN_BREADCRUMB,
+  ) + $base;
+  $items['admin/structure/services/list/%services_endpoint/resources'] = array(
+    'title' => 'Resources',
+    'page callback' => 'backdrop_get_form',
+    'page arguments' => array('services_edit_form_endpoint_resources', 4),
+    'type' => MENU_VISIBLE_IN_BREADCRUMB,
+  ) + $base;
+  $items['admin/structure/services/list/%services_endpoint/server'] = array(
+    'title' => 'Resources',
+    'page callback' => 'backdrop_get_form',
+    'page arguments' => array('services_edit_form_endpoint_server', 4),
+    'type' => MENU_VISIBLE_IN_BREADCRUMB,
+  ) + $base;
+  $items['admin/structure/services/list/%services_endpoint/authentication'] = array(
+    'title' => 'Resources',
+    'page callback' => 'backdrop_get_form',
+    'page arguments' => array('services_edit_form_endpoint_authentication', 4),
+    'type' => MENU_VISIBLE_IN_BREADCRUMB,
+  ) + $base;
 
   $items['services/session/token'] = array(
     'page callback' => '_services_session_token',
@@ -388,7 +479,7 @@ function services_endpoint_new() {
  *  The endpoint configuration.
  */
 function services_endpoint_load($name) {
-  $result = services_load_endpoint_object($name);
+  $result = services_endpoint_load_all($name);
   if (isset($result[$name])) {
     return $result[$name];
   }
@@ -402,7 +493,6 @@ function services_endpoint_load($name) {
  *  Array of endpoint objects keyed by endpoint names.
  */
 function services_endpoint_load_all() {
-  dpm(services_load_endpoint_object());
   return services_load_endpoint_object();
 }
 
@@ -423,7 +513,7 @@ function services_endpoint_save($endpoint) {
     }
   }
   services_endpoint_crud_save($endpoint);
-  services_load_endpoint_object_reset();
+  // services_load_endpoint_object_reset();
   menu_rebuild();
   cache_clear_all('services:' . $endpoint->name . ':', 'cache', TRUE);
 }
@@ -1151,6 +1241,7 @@ function services_endpoint_crud_save(&$object) {
       $update = array();
       $object->export_type = EXPORT_IN_DATABASE;
     }
+dpm($object);
     return backdrop_write_record('services_endpoint', $object, $update);
   }
 }
@@ -1223,8 +1314,8 @@ function services_load_endpoint_object($name = NULL) {
   $result = $query->execute();
   $conditions = array();
   $query_args = array();
-  $status = array();
 
+  
   // Unpack the results of the query onto objects and cache them.
   foreach ($result as $data) {
     $object = new stdClass;
@@ -1233,7 +1324,7 @@ function services_load_endpoint_object($name = NULL) {
     $object->type = t('Normal');
     $object->export_type = EXPORT_IN_DATABASE;
     foreach ($data as $field_name => $field) {
-      if ($field->serialize) {
+      if (!empty($schema['fields'][$field_name]['serialize'])) {
         $object->{$field_name} = unserialize($field);
       }
       else {
@@ -1241,23 +1332,19 @@ function services_load_endpoint_object($name = NULL) {
       }
 
     }
+    unset($object->eid);
+    unset($object->table);
+
     $cache[$object->name] = $object;
   }
 
   // Todo get rid of the DB table and do all this in config
   $defaults = _services_endpoint_get_defaults($table);
-  dpm($defaults);
 
   if ($defaults) {
     foreach ($defaults as $object) {
       if ($object->name != $name) {
         continue;
-      }
-
-      // Determine if default object is enabled or disabled.
-      // Todo figure this status business
-      if (isset($status[$object->name])) {
-        $object->disabled = $status[$object->name];
       }
 
       if (!empty($cache[$object->name])) {
@@ -1277,7 +1364,7 @@ function services_load_endpoint_object($name = NULL) {
   }
 
   // If fetching all, we've done so and we are finished.
-  if (!$name) {
+  if ($cache && !$name) {
     $cached_database = TRUE;
     return $cache;
   }
@@ -1285,11 +1372,12 @@ function services_load_endpoint_object($name = NULL) {
   return array();
 }
 
+// todo fix this
 function _services_endpoint_get_defaults($table) {
   //$cache = &backdrop_static(__FUNCTION__, array());
   $cache = NULL;
 
-  if (!isset($cache)) {
+/*   if (!isset($cache)) {
     $cache = array();
 
     $modules = module_implements('services_endpoint_info');
@@ -1306,7 +1394,7 @@ function _services_endpoint_get_defaults($table) {
 
     backdrop_alter('services_endpoint_info', $cache);
   }
-
+ */
   return $cache;
 }
 

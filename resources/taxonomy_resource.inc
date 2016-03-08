@@ -115,7 +115,7 @@ function _taxonomy_resource_definition() {
               'optional' => TRUE,
               'type' => 'int',
               'description' => 'Number of records to get per page.',
-              'default value' => config_get('services.settings', ('services_taxonomy_term_index_page_size'),
+              'default value' => config_get('services.settings', 'services_taxonomy_term_index_page_size'),
               'source' => array('param' => 'pagesize'),
             ),
             array(
@@ -281,7 +281,7 @@ function _taxonomy_resource_definition() {
               'optional' => TRUE,
               'type' => 'int',
               'description' => 'Number of records to get per page.',
-              'default value' => config_get('services.settings', ('services_taxonomy_vocabulary_index_page_size'),
+              'default value' => config_get('services.settings', 'services_taxonomy_vocabulary_index_page_size'),
               'source' => array('param' => 'pagesize'),
             ),
             array(

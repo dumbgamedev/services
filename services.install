@@ -61,6 +61,12 @@ function services_schema() {
         'serialize'      => TRUE,
         'object default' => array(),
       ),
+      'status' => array(
+       'description' => 'Set the endpoint enabled or disabled.',
+         'type'        => 'int',
+         'not null'    => TRUE,
+         'default'     => 1
+      ),
       'debug' => array(
        'description' => 'Set the endpoint in debug mode.',
          'type'        => 'int',
