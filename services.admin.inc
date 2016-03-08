@@ -172,7 +172,7 @@ function theme_services_resource_table($variables) {
 
   backdrop_add_css(backdrop_get_path('module', 'services') . '/css/services.admin.css');
   backdrop_add_js(backdrop_get_path('module', 'services') . '/js/services.admin.js');
-  backdrop_add_js('misc/tableselect.js');
+  backdrop_add_js('core/misc/tableselect.js');
 
   // Create header for resource selection table.
   $header = array(
@@ -185,8 +185,8 @@ function theme_services_resource_table($variables) {
   // Define the images used to expand/collapse the method groups.
   $js = array(
     'images' => array(
-      'collapsed' => theme('image', array('path' => 'misc/menu-collapsed.png', 'alt' => t('Expand'), 'title' => t('Expand'))) . ' <a href="#" class="resource-collapse">(' . t('Expand') . ')</a>',
-      'expanded' => theme('image', array('path' => 'misc/menu-expanded.png', 'alt' => t('Collapse'), 'title' => t('Collapse'))) . ' <a href="#" class="resource-collapse">(' . t('Collapse') . ')</a>',
+      'collapsed' => theme('image', array('uri' => 'core/misc/menu-collapsed.png', 'alt' => t('Expand'), 'title' => t('Expand'))) . ' <a href="#" class="resource-collapse">(' . t('Expand') . ')</a>',
+      'expanded' => theme('image', array('uri' => 'core/misc/menu-expanded.png', 'alt' => t('Collapse'), 'title' => t('Collapse'))) . ' <a href="#" class="resource-collapse">(' . t('Collapse') . ')</a>',
     ),
   );
 
