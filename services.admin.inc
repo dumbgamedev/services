@@ -296,7 +296,7 @@ function theme_services_resource_table($variables) {
 function services_list_page() {
   $endpoints = services_endpoint_load_all();
   // backdrop_sort($endpoints, array('title' => SORT_STRING));
-  $header = array(t('Name'), t('Storage'), t('Operations'));
+  $header = array(t('Name'), t('Path'), t('Operations'));
   $ops = array(
     'edit'   => t('Edit'),
     'clone' => t('Clone'),
@@ -315,8 +315,8 @@ function services_list_page() {
       $ops['enable'] = t('Enable');
     }
     $row = array();
-    $row[] = 'title';
-    $row[] = 'row';
+    $row[] = $endpoint->name;
+    $row[] = $endpoint->path;
     $links = array();
     foreach ($ops as $key => $op) {
       $links[$key] = array(
@@ -967,8 +967,6 @@ function services_endpoint_clone_form($form, &$form_state, $endpoint) {
   $new_endpoint->is_new = TRUE;
 
   $form = services_endpoint_edit_form($form, $form_state, $new_endpoint);
-  $form['title']['#default_value'] = t('Clone of ') . $form['title']['#default_value'];
-  $form['title']['#access'] = FALSE;
   $form['name']['#default_value'] = 'clone_of_' . $form['name']['#default_value'];
   $form['actions']['submit']['#value'] = t('Clone endpoint');
 
