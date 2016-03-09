@@ -235,10 +235,9 @@ function services_menu() {
     }
   }
 
-  // Minor code reduction technique.
   $base = array(
     'access callback' => 'user_access',
-    'access arguments' => array('administer endpoints'),
+    'access arguments' => array('administer services'),
     'file' => 'services.admin.inc',
   );
 
@@ -249,10 +248,10 @@ function services_menu() {
     'type' => MENU_NORMAL_ITEM,
   ) + $base;
   $items['admin/structure/services/list'] = array(
-      'title' => 'List endpoints',
-      'type' => MENU_DEFAULT_LOCAL_TASK,
-      'weight' => -1,
-    );
+    'title' => 'List endpoints',
+    'type' => MENU_DEFAULT_LOCAL_TASK,
+    'weight' => -1,
+  );
 
   $items['admin/structure/services/add'] = array(
     'title' => 'Add endpoint',
@@ -267,7 +266,6 @@ function services_menu() {
     'page callback' => 'backdrop_get_form',
     'page arguments' => array('services_endpoint_edit_form', 4),
     'type' => MENU_NORMAL_ITEM,
-    // 'context' => MENU_CONTEXT_PAGE | MENU_CONTEXT_INLINE,
     'weight' => -10,
   ) + $base;
   // Additional pages for acting on an endpoint.
@@ -276,30 +274,25 @@ function services_menu() {
     'page callback' => 'backdrop_get_form',
     'page arguments' => array('services_endpoint_edit_form', 4),
     'type' => MENU_DEFAULT_LOCAL_TASK,
-    // 'context' => MENU_CONTEXT_PAGE | MENU_CONTEXT_INLINE,
     'weight' => -10,
   ) + $base;
   $items['admin/structure/services/list/%services_endpoint/clone'] = array(
     'title' => 'Clone endpoint',
     'page callback' => 'backdrop_get_form',
     'page arguments' => array('services_endpoint_clone_form', 4),
-    'context' => MENU_CONTEXT_PAGE | MENU_CONTEXT_INLINE,
     'type' => MENU_VISIBLE_IN_BREADCRUMB,
   ) + $base;
   $items['admin/structure/services/list/%services_endpoint/delete'] = array(
     'title' => 'Delete endpoint',
     'page callback' => 'backdrop_get_form',
     'page arguments' => array('services_endpoint_delete_form', 4),
-    // 'access callback' => 'views_ui_menu_action_access',
-    // 'access arguments' => array(4, 'delete'),
-    'context' => MENU_CONTEXT_PAGE | MENU_CONTEXT_INLINE,
     'type' => MENU_VISIBLE_IN_BREADCRUMB,
   ) + $base;
   $items['admin/structure/services/list/%services_endpoint/enable'] = array(
-      'title' => 'Enable endpoint',
+    'title' => 'Enable endpoint',
     'page callback' => 'backdrop_get_form',
     'page arguments' => array('services_toggle_enable_page', 4),
-      'type' => MENU_VISIBLE_IN_BREADCRUMB,
+    'type' => MENU_VISIBLE_IN_BREADCRUMB,
     ) + $base;
   $items['admin/structure/services/list/%services_endpoint/disable'] = array(
     'title' => 'Disable endpoint',
