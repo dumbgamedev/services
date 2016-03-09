@@ -308,7 +308,7 @@ function services_menu() {
   $items['admin/structure/services/list/%services_endpoint/delete'] = array(
     'title' => 'Delete endpoint',
     'page callback' => 'backdrop_get_form',
-    'page arguments' => array('views_ui_delete_form', 4),
+    'page arguments' => array('services_endpoint_delete_form', 4),
     // 'access callback' => 'views_ui_menu_action_access',
     // 'access arguments' => array(4, 'delete'),
     'context' => MENU_CONTEXT_PAGE | MENU_CONTEXT_INLINE,
@@ -547,7 +547,7 @@ function services_endpoint_delete($endpoint) {
     ->condition('name', $endpoint->name)
     ->execute();
 
-  services_load_endpoint_object_reset('services_endpoint');
+  // services_load_endpoint_object_reset('services_endpoint');
   menu_rebuild();
   cache_clear_all('services:' . $endpoint->name . ':', 'cache', TRUE);
 }

@@ -1022,3 +1022,27 @@ function services_toggle_enable_page_submit($form, &$form_state) {
   backdrop_goto('admin/structure/services/list');
 }
 
+/**
+ * Form callback; Disable or enable an endpoint.
+ *
+ * @ingroup forms
+ */
+function services_endpoint_delete_form($form, &$form_state, $endpoint) {
+  $form_state['endpoint'] = $endpoint;
+  $question = t('Are you sure you wish to delete endpoint @title? This action cannot be undone.', array('@title' => $endpoint->name));
+  $text = t('Delete this endpoint?');
+  $button_text = t('Delete endpoint');
+
+  return confirm_form($form, $question, 'admin/structure/services/list', $text, $button_text);
+}
+
+/**
+ * Submit handler for services_toggle_enable_page_submit().
+ */
+function services_endpoint_delete_form_submit($form, &$form_state) {
+  $endpoint = $form_state['endpoint'];
+  services_endpoint_delete($endpoint);
+  backdrop_set_message($endpoint->name . ' was deleted.');
+  backdrop_goto('admin/structure/services/list');
+}
+
