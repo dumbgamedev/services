@@ -515,10 +515,6 @@ function services_endpoint_load_all() {
  * @return void
  */
 function services_endpoint_save($endpoint) {
-  if (is_array($endpoint) && isset($endpoint['build_info'])) {
-    $endpoint = $endpoint['build_info']['args'][0];
-  }
-
   // Set a default of an array if the value is not present.
   foreach (array('server_settings', 'resources', 'authentication') as $endpoint_field) {
     if (empty($endpoint->{$endpoint_field})) {
@@ -528,7 +524,6 @@ function services_endpoint_save($endpoint) {
   if ($endpoint->is_new) {
     // New record.
     $update = array();
-    $endpoint->is_new = TRUE;
   }
   else {
     // Existing record.

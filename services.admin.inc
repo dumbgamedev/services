@@ -523,6 +523,7 @@ function services_endpoint_edit_form_submit(&$form, &$form_state) {
     }
   }
   $endpoint->authentication = $auth;
+  $endpoint->is_new = TRUE;
 
   services_endpoint_save($endpoint);
   $form_state['redirect'] = 'admin/structure/services';
