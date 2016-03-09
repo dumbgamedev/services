@@ -505,8 +505,8 @@ function services_endpoint_save($endpoint) {
   }
 
   backdrop_write_record('services_endpoint', $endpoint, $update);
-  // todo
-  // services_load_endpoint_object_reset();
+
+  backdrop_static_reset('services_load_endpoint_object');
   menu_rebuild();
   cache_clear_all('services:' . $endpoint->name . ':', 'cache', TRUE);
 }
@@ -521,7 +521,7 @@ function services_endpoint_delete($endpoint) {
     ->condition('name', $endpoint->name)
     ->execute();
 
-  // services_load_endpoint_object_reset('services_endpoint');
+  backdrop_static_reset('services_load_endpoint_object');
   menu_rebuild();
   cache_clear_all('services:' . $endpoint->name . ':', 'cache', TRUE);
 }
