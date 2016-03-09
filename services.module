@@ -169,25 +169,6 @@ function services_security_update_reset_users_with_password_one_op($progress, $l
 }
 
 /**
- * Implements hook_help().
- */
-function services_help($path, $arg) {
-  $output = NULL;
-
-  switch ($path) {
-    case 'admin/help#services':
-      $output = '<p>' . t('Visit the <a href="@handbook_url">Services Handbook</a> for help and information.', array('@handbook_url' => 'http://backdrop.org/node/109782')) . '</p>';
-      break;
-    case 'admin/structure/services':
-      $output = '<p>' . t('Services are collections of methods available to remote applications. They are defined in modules, and may be accessed in a number of ways through server modules. Visit the <a href="@handbook_url">Services Handbook</a> for help and information.', array('@handbook_url' => 'http://backdrop.org/node/109782')) . '</p>';
-      $output .= '<p>' . t('All enabled services and methods are shown. Click on any method to view information or test.') . '</p>';
-      break;
-  }
-
-  return $output;
-}
-
-/**
  * Implements hook_perm().
  */
 function services_permission() {
