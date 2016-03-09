@@ -78,17 +78,6 @@ function services_schema() {
     'unique keys' => array(
       'name' => array('name'),
     ),
-    'export' => array(
-      'key' => 'name',
-      'identifier' => 'endpoint',
-      'primary key' => 'name',
-      'api' => array(
-        'owner' => 'services',
-        'api' => 'services',
-        'minimum_version' => 3,
-        'current_version' => 3,
-      ),
-    ),
   );
   $schema['services_user'] = array(
     'description' => 'Stores users created/updated by services.',

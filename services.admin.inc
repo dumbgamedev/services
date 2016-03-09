@@ -356,7 +356,7 @@ function services_endpoint_edit_form($form, &$form_state, $endpoint = NULL) {
     '#type' => 'machine_name',
     '#machine_name' => array(
       'source' => array('title'),
-      'exists' => 'services_ctools_export_ui_form_machine_name_exists',
+      'exists' => 'services_endpoint_machine_name_exists',
     ),
     '#maxlength' => 128,
     '#default_value' => isset($endpoint->name) ? $endpoint->name : '',
@@ -477,7 +477,7 @@ function services_endpoint_edit_form_validate(&$form, &$form_state) {
 /**
  * Endpoint name check whether this machine name already exists.
  */
-function services_ctools_export_ui_form_machine_name_exists($value) {
+function services_endpoint_machine_name_exists($value) {
   // Validate Name.
 //  $query = db_select('services_endpoint', 'e');
 //  $query->addField('e', 'eid');
@@ -975,7 +975,7 @@ function services_get_update_versions($resource, $method) {
  */
 function services_endpoint_clone_form($form, &$form_state, $endpoint) {
   $new_endpoint = clone($endpoint);
-  $new_endpoint->export_type = NULL;
+  $new_endpoint->is_new = TRUE;
 
   $form = services_endpoint_edit_form($form, $form_state, $new_endpoint);
   $form['title']['#default_value'] = t('Clone of ') . $form['title']['#default_value'];

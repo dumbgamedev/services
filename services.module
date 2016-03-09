@@ -238,8 +238,6 @@ function services_hook_info() {
 
 /**
  * Implements hook_menu().
- *
- * Services UI is defined in the export-ui plugin.
  */
 function services_menu() {
   $items = array();
@@ -311,7 +309,7 @@ function services_menu() {
     'title' => 'Delete endpoint',
     'page callback' => 'backdrop_get_form',
     'page arguments' => array('views_ui_delete_form', 4),
-    'access callback' => 'views_ui_menu_action_access',
+    // 'access callback' => 'views_ui_menu_action_access',
     // 'access arguments' => array(4, 'delete'),
     'context' => MENU_CONTEXT_PAGE | MENU_CONTEXT_INLINE,
     'type' => MENU_VISIBLE_IN_BREADCRUMB,
@@ -467,7 +465,22 @@ function services_endpoint_callback($endpoint_name) {
  *  An endpoint initialized with the default values.
  */
 function services_endpoint_new() {
-  return services_endpoint_new_object();
+  $schema = backdrop_get_schema('services_endpoint');
+
+  $object = new stdClass;
+  foreach ($schema['fields'] as $field => $info) {
+    if (isset($info['object default'])) {
+      $object->$field = $info['object default'];
+    }
+    else if (isset($info['default'])) {
+      $object->$field = $info['default'];
+    }
+    else {
+      $object->$field = NULL;
+    }
+  }
+
+  return $object;
 }
 
 /**
@@ -512,7 +525,18 @@ function services_endpoint_save($endpoint) {
       $endpoint->{$endpoint_field} = array();
     }
   }
-  services_endpoint_crud_save($endpoint);
+  if ($endpoint->is_new) {
+    // New record.
+    $update = array();
+    $endpoint->is_new = TRUE;
+  }
+  else {
+    // Existing record.
+    $update = array('name');
+  }
+
+  backdrop_write_record('services_endpoint', $endpoint, $update);
+  // todo
   // services_load_endpoint_object_reset();
   menu_rebuild();
   cache_clear_all('services:' . $endpoint->name . ':', 'cache', TRUE);
@@ -524,22 +548,14 @@ function services_endpoint_save($endpoint) {
  * @return void
  */
 function services_endpoint_delete($endpoint) {
-  services_endpoint_crud_delete($endpoint);
+  db_delete('services_endpoint')
+    ->condition('name', $endpoint->name)
+    ->execute();
+
   services_load_endpoint_object_reset('services_endpoint');
   menu_rebuild();
   cache_clear_all('services:' . $endpoint->name . ':', 'cache', TRUE);
 }
-
-/**
- * Export an endpoint.
- *
- * @return string
- * Todo replace this with config.
- */
-function services_endpoint_export($endpoint, $indent = '') {
-  return ctools_export_object('services_endpoint', $endpoint, $indent);
-}
-
 
 /**
  * Gets all resource definitions.
@@ -1172,110 +1188,6 @@ function _services_session_token() {
   backdrop_exit();
 }
 
-/**
- * Create a new object based upon schema values.
- *
- * Because 'default' has ambiguous meaning on some fields, we will actually
- * use 'object default' to fill in default values if default is not set
- * That's a little safer to use as it won't cause weird database default
- * situations.
- */
-function services_endpoint_new_object() {
-  $schema = backdrop_get_schema('services_endpoint');
-  $export = $schema['export'];
-
-  $object = new $export['object'];
-  foreach ($schema['fields'] as $field => $info) {
-    if (isset($info['object default'])) {
-      $object->$field = $info['object default'];
-    }
-    else if (isset($info['default'])) {
-      $object->$field = $info['default'];
-    }
-    else {
-      $object->$field = NULL;
-    }
-  }
-
-  $object->export_type = NULL;
-  $object->{$export['export type string']} = t('Local');
-
-  return $object;
-}
-
-/**
- * Save a single exportable object.
- *
- * @param $table
- *   The name of the table to use to retrieve $schema values. This table
- *   must have an 'export' section containing data or this function
- *   will fail.
- * @param $object
- *   The fully populated object to save.
- *
- * @return
- *   Failure to write a record will return FALSE. Otherwise SAVED_NEW or
- *   SAVED_UPDATED is returned depending on the operation performed. The
- *   $object parameter contains values for any serial fields defined by the $table
- */
-function services_endpoint_crud_save(&$object) {
-  $schema = backdrop_get_schema('services_endpoint');
-  $export = $schema['export'];
-
-  if (!empty($export['save callback']) && function_exists($export['save callback'])) {
-    return $export['save callback']($object);
-  }
-  else {
-    // Objects should have a serial primary key. If not, simply fail to write.
-    if (empty($export['primary key'])) {
-      return FALSE;
-    }
-
-    $key = $export['primary key'];
-    if ($object->export_type & EXPORT_IN_DATABASE) {
-      // Existing record.
-      $update = array($key);
-    }
-    else {
-      // New record.
-      $update = array();
-      $object->export_type = EXPORT_IN_DATABASE;
-    }
-
-    return backdrop_write_record('services_endpoint', $object, $update);
-  }
-}
-
-/**
- * Delete a single exportable object.
- *
- * This only deletes from the database, which means that if an item is in
- * code, then this is actually a revert.
- *
- * @param $table
- *   The name of the table to use to retrieve $schema values. This table
- *   must have an 'export' section containing data or this function
- *   will fail.
- * @param $object
- *   The fully populated object to delete, or the export key.
- */
-function services_endpoint_crud_delete($object) {
-  $schema = backdrop_get_schema('services_endpoint');
-  $export = $schema['export'];
-
-  if (!empty($export['delete callback']) && function_exists($export['delete callback'])) {
-    return $export['delete callback']($object);
-  }
-  else {
-    // If we were sent an object, get the export key from it. Otherwise
-    // assume we were sent the export key.
-    $value = is_object($object) ? $object->{$export['key']} : $object;
-    db_delete('services_endpoint')
-      ->condition($export['key'], $value)
-      ->execute();
-  }
-}
-
 function services_load_endpoint_object($name = NULL) {
   $table = 'services_endpoint';
 
@@ -1297,24 +1209,18 @@ function services_load_endpoint_object($name = NULL) {
     return $cache;
   }
 
-
   // Don't load anything we've already cached.
   if (!empty($name) && isset($cache[$name])) {
     return $cache[$name];
   }
 
-
   // Build the query
   $query = db_select($table, 'q')->fields('q');
-  $alias_count = 1;
 
   if ($name) {
     $query->condition('name', array($name), 'IN');
   }
   $result = $query->execute();
-  $conditions = array();
-  $query_args = array();
-
   
   // Unpack the results of the query onto objects and cache them.
   foreach ($result as $data) {
@@ -1322,7 +1228,6 @@ function services_load_endpoint_object($name = NULL) {
     $object->name = $data->name;
     $object->table = $table;
     $object->type = t('Normal');
-    $object->export_type = EXPORT_IN_DATABASE;
     foreach ($data as $field_name => $field) {
       if (!empty($schema['fields'][$field_name]['serialize'])) {
         $object->{$field_name} = unserialize($field);
@@ -1338,73 +1243,12 @@ function services_load_endpoint_object($name = NULL) {
     $cache[$object->name] = $object;
   }
 
-  // Todo get rid of the DB table and do all this in config
-  $defaults = _services_endpoint_get_defaults($table);
-
-  if ($defaults) {
-    foreach ($defaults as $object) {
-      if ($object->name != $name) {
-        continue;
-      }
-
-      if (!empty($cache[$object->name])) {
-        $cache[$object->name]->type = t('Overrnameden');
-        $cache[$object->name]->export_type |= EXPORT_IN_CODE;
-        $cache[$object->name]->export_module = isset($object->export_module) ? $object->export_module : NULL;
-      }
-      else {
-        $object->type = t('Default');
-        $object->export_type = EXPORT_IN_CODE;
-        $object->in_code_only = TRUE;
-        $object->table = $table;
-
-        $cache[$object->name] = $object;
-      }
-    }
-  }
-
-  // If fetching all, we've done so and we are finished.
   if ($cache && !$name) {
     $cached_database = TRUE;
     return $cache;
   }
 
   return array();
-}
-
-// todo fix this
-function _services_endpoint_get_defaults($table) {
-  //$cache = &backdrop_static(__FUNCTION__, array());
-  $cache = NULL;
-
-/*   if (!isset($cache)) {
-    $cache = array();
-
-    $modules = module_implements('services_endpoint_info');
-    foreach ($modules as $module) {
-      $function = $module . '_services_endpoint_info';
-      if (function_exists($function)) {
-        foreach ((array) $function() as $name => $object) {
-          // Record the module that provides this exportable.
-          $object->export_module = $module;
-          $cache[$name] = $object;
-        }
-      }
-    }
-
-    backdrop_alter('services_endpoint_info', $cache);
-  }
- */
-  return $cache;
-}
-
-/*
- * Implements hook_services_endpoint_info().
- */
-function services_services_endpoint_info() {
-  module_load_include('inc', 'services', 'plugins/export_ui/services_ctools_export_ui');
-
-  return _services_services_endpoint_info();
 }
 
 /**
