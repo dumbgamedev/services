@@ -344,23 +344,16 @@ function services_endpoint_edit_form($form, &$form_state, $endpoint = NULL) {
   module_load_include('inc', 'services', 'includes/services.runtime');
 
   $form = array();
-  $form['title'] = array(
-    '#title' => t('Machine-readable name of the endpoint'),
-    '#type' => 'textfield',
-    '#maxlength' => 128,
-    '#default_value' => isset($endpoint->name) ? $endpoint->name : '',
-    '#required' => TRUE,
-    '#description' => t('The endpoint name can only consist of lowercase letters, underscores, and numbers.'),
-  );
   $form['name'] = array(
     '#type' => 'machine_name',
+    '#title' => t('Machine-readable name of the endpoint'),
     '#machine_name' => array(
-      'source' => array('title'),
       'exists' => 'services_endpoint_machine_name_exists',
     ),
     '#maxlength' => 128,
     '#default_value' => isset($endpoint->name) ? $endpoint->name : '',
     '#required' => TRUE,
+    '#description' => t('The endpoint name can only consist of lowercase letters, underscores, and numbers.'),
   );
 
   $form['eid'] = array(
@@ -478,11 +471,6 @@ function services_endpoint_edit_form_validate(&$form, &$form_state) {
  * Endpoint name check whether this machine name already exists.
  */
 function services_endpoint_machine_name_exists($value) {
-  // Validate Name.
-//  $query = db_select('services_endpoint', 'e');
-//  $query->addField('e', 'eid');
-//  $query->condition('name', $value);
-
   $result = db_query('SELECT eid FROM {services_endpoint} WHERE name = :name', array(':name' => $value))->fetchField();
   return !empty($result);
 }
