@@ -308,7 +308,6 @@ function services_list_page() {
 
   $rows = array();
   foreach ($endpoints as $endpoint) {
-    dpm($endpoint);
     if ($endpoint->status) {
       $ops['disable'] = t('Disable');
     }

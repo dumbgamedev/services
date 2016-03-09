@@ -245,7 +245,7 @@ function services_menu() {
   $items = array();
   $endpoints = services_endpoint_load_all();
   foreach ($endpoints as $endpoint) {
-    if (empty($endpoint->status)) {
+    if (!empty($endpoint->status)) {
       $items[$endpoint->path] = array(
         'title'             => 'Services endpoint',
         'access callback'   => 'services_access_menu',
@@ -1241,7 +1241,7 @@ function services_endpoint_crud_save(&$object) {
       $update = array();
       $object->export_type = EXPORT_IN_DATABASE;
     }
-dpm($object);
+
     return backdrop_write_record('services_endpoint', $object, $update);
   }
 }
@@ -1405,4 +1405,14 @@ function services_services_endpoint_info() {
   module_load_include('inc', 'services', 'plugins/export_ui/services_ctools_export_ui');
 
   return _services_services_endpoint_info();
+}
+
+/**
+ * Implements hook_autoload_info().
+ */
+function services_autoload_info() {
+  return array(
+    'ServicesException' => 'includes/services.runtime.inc',
+    'ServicesArgumentException' => 'includes/services.runtime.inc',
+  );
 }

@@ -179,7 +179,7 @@ function _rest_server_add_default_and_remove_unknown(&$array, $keys, $default) {
 function rest_server_libraries_info() {
   $libraries['spyc'] = array(
     'name' => 'Spyc',
-    'version' => '0.5.1',
+    'version' => '2.0.0',
     'vendor url' => 'https://github.com/mustangostang/spyc',
     'download url' => 'https://raw2.github.com/mustangostang/spyc/master/Spyc.php',
     'version arguments' => array(
@@ -192,4 +192,39 @@ function rest_server_libraries_info() {
   );
 
   return $libraries;
+}
+
+/**
+ * Implements hook_autoload_info().
+ */
+function rest_server_autoload_info() {
+  return array(
+    'RESTServer' => 'includes/RESTServer.inc',
+    'ServicesContentTypeNegotiator' => 'includes/ServicesContentTypeNegotiator.inc',
+    'ServicesContentTypeNegotiatorInterface' => 'includes/ServicesContentTypeNegotiator.inc',
+    
+    'ServicesContext' => 'includes/ServicesContext.inc',
+    'ServicesContextInterface' => 'includes/ServicesContext.inc',
+
+    'ServicesJSONFormatter' => 'includes/ServicesFormatter.inc',
+    'ServicesJSONPFormatter' => 'includes/ServicesFormatter.inc',
+    'ServicesPHPFormatter' => 'includes/ServicesFormatter.inc',
+    'ServicesXMLFormatter' => 'includes/ServicesFormatter.inc',
+    'ServicesYAMLFormatter' => 'includes/ServicesFormatter.inc',
+    'ServicesBencodeFormatter' => 'includes/ServicesFormatter.inc',
+    'ServicesFormatterInterface' => 'includes/ServicesFormatter.inc',
+
+    'ServicesParserURLEncoded' => 'includes/ServicesParser.inc',
+    'ServicesParserPHP' => 'includes/ServicesParser.inc',
+    'ServicesParserXML' => 'includes/ServicesParser.inc',
+    'ServicesParserJSON' => 'includes/ServicesParser.inc',
+    'ServicesParserFile' => 'includes/ServicesParser.inc',
+    'ServicesParserYAML' => 'includes/ServicesParser.inc',
+    'ServicesParserMultipart' => 'includes/ServicesParser.inc',
+    'ServicesParserInterface' => 'includes/ServicesParser.inc',
+    
+    'ServicesRESTServerFactory' => 'includes/ServicesRESTServerFactory.inc',
+
+    'Mimeparse' => 'lib/mimeparse.inc',
+  );
 }
