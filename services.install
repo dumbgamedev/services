@@ -101,6 +101,7 @@ function services_schema() {
         'default' => 0,
       ),
     ),
+    'primary key' => array('uid'),
   );
   return $schema;
 }
