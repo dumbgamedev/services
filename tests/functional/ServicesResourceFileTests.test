@@ -57,6 +57,7 @@ class ServicesResourceFileTests extends ServicesWebTestCase {
     // Create a set of files to test with
     $files = array();
     foreach($this->testfiles as $file) {
+      $file = new File((array) $file);
       file_save($file);
       $files[$file->fid] = $file;
     }
@@ -156,6 +157,7 @@ class ServicesResourceFileTests extends ServicesWebTestCase {
    */
   public function testResourceFileRetrieve() {
     $testfile = $this->testfile;
+    $testfile = new File((array) $testfile);
 
     $testfile->fid = NULL;
     $testfile->uid = $this->privileged_user->uid;
@@ -177,6 +179,7 @@ class ServicesResourceFileTests extends ServicesWebTestCase {
    */
   public function testResourceFileDelete() {
     $testfile = $this->testfile;
+    $testfile = new File((array) $testfile);
 
     $testfile->fid = NULL;
     $testfile->uid = $this->privileged_user->uid;

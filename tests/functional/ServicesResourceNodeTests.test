@@ -31,6 +31,13 @@ class ServicesResourceNodetests extends ServicesWebTestCase {
     );
     // Set up endpoint.
     $this->endpoint =  $this->saveNewEndpoint();
+    // Delete the two Backdrop welcome nodes.
+    node_delete_multiple(array(1, 2));
+
+    // Set comment subject enabled.
+    $node_type = node_type_get_type('page');
+    $node_type->settings['comment_subject_field'] = 1;
+    node_type_save($node_type);
   }
 
   /**
@@ -140,7 +147,7 @@ class ServicesResourceNodetests extends ServicesWebTestCase {
     // Generate 15 comments for node.
     $comments = array();
     for ($i = 1; $i <= 15; $i++) {
-      $comment = (object)$this->getCommentValues($nid);
+      $comment = $this->getCommentValues($nid);
       comment_save($comment);
       $comments[$i] = comment_load($comment->cid);
     }
@@ -148,7 +155,7 @@ class ServicesResourceNodetests extends ServicesWebTestCase {
     // Generate some comments for another node.
     $node2 = $this->backdropCreateNode();
     for ($i = 1; $i <= 5; $i++) {
-      $comment = (object)$this->getCommentValues($node2->nid);
+      $comment = $this->getCommentValues($node2->nid);
       comment_save($comment);
     }
 
@@ -274,15 +281,15 @@ class ServicesResourceNodetests extends ServicesWebTestCase {
    * Testing targeted_action attach_file.
    */
   public function testAttachFileTargetedAction() {
-    // We will do test on the article node type.
+    // We will do test on the post node type.
     // Create and log in our privileged user.
     $account = $this->backdropCreateUser(array(
       'bypass node access',
     ));
     $this->backdropLogin($account);
 
-    // Create article node.
-    $settings = array('type' => 'article');
+    // Create post node.
+    $settings = array('type' => 'post');
     $node = $this->backdropCreateNode($settings);
 
     // Get a test file.
@@ -296,13 +303,13 @@ class ServicesResourceNodetests extends ServicesWebTestCase {
     $node = node_load($node->nid, TRUE);
     $this->assertEqual($testfile1->filename, $node->field_image[LANGUAGE_NONE][0]['filename'], 'One file has been attached.');
 
-    // Replace the file on the article node.
+    // Replace the file on the post node.
     $result = $this->servicesPostFile($this->endpoint->path . '/node/' . $node->nid . '/attach_file',
       array($testfile2->uri), array(), array('field_name' => 'field_image', 'attach' => FALSE));
     $node = node_load($node->nid, TRUE);
     $this->assertEqual($testfile2->filename, $node->field_image[LANGUAGE_NONE][0]['filename'], 'File has been replaced.');
 
-    // Add another file to the article node. Get validation error.
+    // Add another file to the post node. Get validation error.
     $result = $this->servicesPostFile($this->endpoint->path . '/node/' . $node->nid . '/attach_file',
       array($testfile1->uri), array(), array('field_name' => 'field_image'));
     $this->assertEqual($result['body'], 'You cannot upload so many files.', 'Validation on cardinality works.');
@@ -529,7 +536,7 @@ class ServicesResourceNodeTaxonomytests extends ServicesWebTestCase {
 
     $this->instance = array(
       'field_name' => 'taxonomy_' . $this->vocabulary->machine_name,
-      'bundle' => 'article',
+      'bundle' => 'post',
       'entity_type' => 'node',
       'widget' => array(
         'type' => 'options_select',
@@ -556,7 +563,7 @@ class ServicesResourceNodeTaxonomytests extends ServicesWebTestCase {
     $term2 = $this->createTerm($this->vocabulary);
     $field_name = $this->instance['field_name'];
 
-    // Post an article.
+    // Post a post node.
     $edit = array();
     $langcode = LANGUAGE_NONE;
     $edit['title'] = $this->randomName();
@@ -591,7 +598,7 @@ class ServicesResourceNodeTaxonomytests extends ServicesWebTestCase {
     $vocabulary->description = $this->randomName();
     $vocabulary->machine_name = backdrop_strtolower($this->randomName());
     $vocabulary->help = '';
-    $vocabulary->nodes = array('article' => 'article');
+    $vocabulary->nodes = array('post' => 'post');
     $vocabulary->weight = mt_rand(0, 10);
     taxonomy_vocabulary_save($vocabulary);
     return $vocabulary;

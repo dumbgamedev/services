@@ -324,16 +324,17 @@ function _node_resource_create($node) {
   // but always make the node author default to the current user (if the user
   // has permission to change it, $form_state['values'] will override this
   // default when the form is submitted).
-  $stub_node = (object) array_intersect_key($node, array_flip(array('type', 'language')));
+  $stub_node = array_intersect_key($node, array_flip(array('type', 'language')));
+  $stub_node = entity_create('node', $stub_node);
   $stub_node->name = $user->name;
 
   // Contributed modules may check the triggering element in the form state.
   // The triggering element is usually set from the browser's POST request, so
   // we'll automatically set it as the submit action from here.
-  $stub_form = backdrop_get_form($node_type . '_node_form', (object) $stub_node);
+  $stub_form = backdrop_get_form($node_type . '_node_form', $stub_node);
   $form_state['triggering_element'] = $stub_form['actions']['submit'];
 
-  backdrop_form_submit($node_type . '_node_form', $form_state, (object)$stub_node);
+  backdrop_form_submit($node_type . '_node_form', $form_state, $stub_node);
 
   if ($errors = form_get_errors()) {
     return services_error(implode(" ", $errors), 406, array('form_errors' => $errors));
@@ -365,10 +366,12 @@ function _node_resource_validate_type($node) {
   if (!isset($types[$node_type])) {
     return services_error(t('Node type @type does not exist.', array('@type' => $node_type)), 406);
   }
-  $allowed_node_types = config_get('services.settings', 'services_allowed_create_content_types');
-  if (!isset($allowed_node_types[$node_type])) {
-    return services_error(t("This node type @type can't be processed via services", array('@type' => $node_type)), 406);
-  }
+  // Will one day need a GUI to allow selecting types.
+  $allowed_node_types = $types;
+  // $allowed_node_types = config_get('services.settings', 'services_allowed_create_content_types');
+  // if (!isset($allowed_node_types[$node_type])) {
+    // return services_error(t("This node type @type can't be processed via services", array('@type' => $node_type)), 406);
+  // }
 }
 
 /**
