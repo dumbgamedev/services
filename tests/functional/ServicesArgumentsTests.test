@@ -49,6 +49,7 @@ class ServicesArgumentsTestCase extends ServicesWebTestCase {
     $endpoint = new stdClass;
     $endpoint->disabled = FALSE; /* Edit this to true to make a default endpoint disabled initially */
     $endpoint->api_version = 3;
+    $endpoint->is_new = TRUE;
     $endpoint->name = $edit['name'];
     $endpoint->title = $edit['title'];
     $endpoint->server = $edit['server'];

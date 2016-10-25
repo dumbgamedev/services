@@ -295,6 +295,7 @@ class ServicesWebTestCase extends BackdropWebTestCase {
     $endpoint = new stdClass;
     $endpoint->disabled = FALSE; /* Edit this to true to make a default endpoint disabled initially */
     $endpoint->api_version = 3;
+    $endpoint->is_new = TRUE;
     $endpoint->name = $edit['name'];
     $endpoint->server = $edit['server'];
     $endpoint->path = $edit['path'];
@@ -532,6 +533,7 @@ class ServicesWebTestCase extends BackdropWebTestCase {
     $endpoint->disabled = FALSE; /* Edit this to true to make a default endpoint disabled initially */
     $endpoint->api_version = 3;
     $endpoint->name = $edit['name'];
+    $endpoint->is_new = TRUE;
     $endpoint->server = $edit['server'];
     $endpoint->path = $edit['path'];
     $endpoint->authentication = array(
@@ -868,7 +870,7 @@ class ServicesWebTestCase extends BackdropWebTestCase {
    * Default values of comment for creating.
    */
   public function getCommentValues($nid) {
-    return array(
+    return entity_create('comment', array(
       'subject' => $this->randomString(),
       'comment_body' => array(
         LANGUAGE_NONE => array(
@@ -884,6 +886,6 @@ class ServicesWebTestCase extends BackdropWebTestCase {
       'uid' => $this->privileged_user->uid,
       'cid' => NULL,
       'pid' => 0,
-    );
+    ));
   }
 }

@@ -27,6 +27,7 @@ class ServicesParserTests extends ServicesWebTestCase {
     // Set up endpoint with disabled 'application/x-www-form-urlencoded' parser.
     $edit = $this->populateEndpointFAPI() ;
     $endpoint = new stdClass;
+    $endpoint->is_new = TRUE;
     $endpoint->disabled = FALSE;
     $endpoint->api_version = 3;
     $endpoint->name = $edit['name'];

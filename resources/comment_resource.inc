@@ -219,7 +219,7 @@ function _comment_resource_create($comment) {
     $comment_empty['pid'] = $comment['pid'];
   }
 
-  $comment_empty = (object) $comment_empty;
+  $comment_empty = entity_create('comment', $comment_empty);
   $form_state['programmed_bypass_access_check'] = FALSE;
   $ret = backdrop_form_submit('comment_form', $form_state, $comment_empty);
 

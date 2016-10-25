@@ -23,6 +23,7 @@ class ServicesAliasTests extends ServicesWebTestCase {
     $edit = $this->populateEndpointFAPI() ;
     $endpoint = new stdClass;
     $endpoint->disabled = FALSE;
+    $endpoint->is_new = TRUE;
     $endpoint->api_version = 3;
     $endpoint->name = $edit['name'];
     $endpoint->server = $edit['server'];

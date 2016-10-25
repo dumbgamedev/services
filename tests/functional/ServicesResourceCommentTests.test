@@ -30,6 +30,11 @@ class ServicesResourceCommentTests extends ServicesWebTestCase {
     // Create and log in our privileged user.
     $this->privileged_user = $this->backdropCreateUser();
     $this->backdropLogin($this->privileged_user);
+
+    // Set comment subject enabled.
+    $node_type = node_type_get_type('page');
+    $node_type->settings['comment_subject_field'] = 1;
+    node_type_save($node_type);
   }
 
   /**
@@ -103,19 +108,20 @@ class ServicesResourceCommentTests extends ServicesWebTestCase {
     // Create comment.
     $comment = $this->getCommentValues($node->nid);
 
-    $response_array = $this->servicesPost($this->endpoint->path . '/comment', $comment);
+    $response_array = $this->servicesPost($this->endpoint->path . '/comment', (array) $comment);
     $commentResourceCreateReturn = $response_array['body'];
     $this->assertTrue(isset($commentResourceCreateReturn['cid']),
       'Comment was successfully created', 'CommentResource: Create');
 
     // Assert subject and body of comment are the same as we created.
     $newComment = comment_load($commentResourceCreateReturn['cid']);
-    $this->assertTrue($newComment->subject == $comment['subject'], 'Subject was the same', 'CommentResource: Create');
-    $this->assertTrue($newComment->comment_body[LANGUAGE_NONE][0]['value'] == $comment['comment_body'][LANGUAGE_NONE][0]['value'],
+
+    $this->assertTrue($newComment->subject == $comment->subject, 'Subject was the same', 'CommentResource: Create');
+    $this->assertTrue($newComment->comment_body[LANGUAGE_NONE][0]['value'] == $comment->comment_body[LANGUAGE_NONE][0]['value'],
       'Body was the same', 'CommentResource: Create');
 
     // Try to create comment with full_html filter that is disabled by default.
-    $comment = array(
+    $comment = entity_create('comment', array(
       'subject' => $this->randomString(),
       'comment_body' => array(
         LANGUAGE_NONE => array(
@@ -131,59 +137,11 @@ class ServicesResourceCommentTests extends ServicesWebTestCase {
       'uid' => $this->privileged_user->uid,
       'cid' => NULL,
       'pid' => 0,
-    );
-    $response_array = $this->servicesPost($this->endpoint->path . '/comment', $comment);
+    ));
+    $response_array = $this->servicesPost($this->endpoint->path . '/comment', (array) $comment);
 
     $this->assertTrue(strpos($response_array['status'], 'An illegal choice has been detected.'),
       'User cannot post comment with full_html filter chosen.', 'CommentResource: Create');
-  }
-
-  /**
-   * Test create comment (Legacy).
-   *
-   * TODO: To be removed in future version.
-   * @see http://backdrop.org/node/1083242
-   */
-  public function testCommentCreateLegacy() {
-    $node = $this->backdropCreateNode();
-
-    // Create comment.
-    $comment = $this->getCommentValues($node->nid);
-
-    $response_array = $this->servicesPost($this->endpoint->path . '/comment', array('comment' => $comment));
-    $commentResourceCreateReturn = $response_array['body'];
-    $this->assertTrue(isset($commentResourceCreateReturn['cid']),
-      'Comment was successfully created', 'CommentResource: Create (Legacy)');
-
-    // Assert subject and body of comment are the same as we created.
-    $newComment = comment_load($commentResourceCreateReturn['cid']);
-    $this->assertTrue($newComment->subject == $comment['subject'],
-      'Subject was the same', 'CommentResource: Create (Legacy)');
-    $this->assertTrue($newComment->comment_body[LANGUAGE_NONE][0]['value'] == $comment['comment_body'][LANGUAGE_NONE][0]['value'],
-      'Body was the same', 'CommentResource: Create (Legacy)');
-
-    // Try to create comment with full_html filter that is disabled by default.
-    $comment = array(
-      'subject' => $this->randomString(),
-      'comment_body' => array(
-        LANGUAGE_NONE => array(
-          array(
-            'value' => $this->randomString(),
-            'format' => 'full_html',
-          )
-        )
-      ),
-      'name' => $this->privileged_user->name,
-      'language' => LANGUAGE_NONE,
-      'nid' => $node->nid,
-      'uid' => $this->privileged_user->uid,
-      'cid' => NULL,
-      'pid' => 0,
-    );
-    $response_array = $this->servicesPost($this->endpoint->path . '/comment', array('comment' => $comment));
-
-    $this->assertTrue(strpos($response_array['status'], 'An illegal choice has been detected.'),
-      'User cannot post comment with full_html filter chosen.', 'CommentResource: Create (Legacy)');
   }
 
   /**
@@ -195,23 +153,20 @@ class ServicesResourceCommentTests extends ServicesWebTestCase {
     // Create node.
     $node = $this->backdropCreateNode();
 
-    $comment_args = $this->getCommentValues($node->nid);
-
-    $comment = (object)$comment_args;
+    $comment = $this->getCommentValues($node->nid);
 
     comment_save($comment);
-    $comment_args['cid'] = $comment->cid;
 
     $response = $this->servicesGet($path . '/comment/' . $comment->cid);
+    $comment_retrieve = (array) $response['body'];
+    $comment = (array) $comment;
 
-    $comment_retrieve = (array)$response['body'];
-
-    $comment_intersect = array_intersect_assoc($comment_retrieve, $comment_args);
+    $comment_intersect = array_intersect_assoc($comment_retrieve, $comment);
 
     // Unset save_value as we don't have this key in arguments.
     unset($comment_intersect['comment_body'][LANGUAGE_NONE][0]['safe_value']);
 
-    $this->assertEqual($comment_args, $comment_intersect, 'Comment retrieved properly.', 'CommentResource: Retrieve');
+    $this->assertEqual($comment, $comment_intersect, 'Comment retrieved properly.', 'CommentResource: Retrieve');
   }
 
   /**
@@ -227,63 +182,20 @@ class ServicesResourceCommentTests extends ServicesWebTestCase {
     // Create node.
     $node = $this->backdropCreateNode();
 
-    $comment_args = $this->getCommentValues($node->nid);
-
-    $comment = (object)$comment_args;
+    $comment = $this->getCommentValues($node->nid);
 
     comment_save($comment);
-    $cid = $comment->cid;
-    $comment_args['cid'] = $cid;
 
-    $comment_update = $comment_args;
-    $comment_update['subject'] = $this->randomString();
-    $comment_update['comment_body'][LANGUAGE_NONE][0]['value'] = $this->randomString();
+    $comment_update = $comment;
+    $comment_update->subject = $this->randomString();
+    $comment_update->comment_body[LANGUAGE_NONE][0]['value'] = $this->randomString();
 
-    $response = $this->servicesPut($path . '/comment/' . $cid, $comment_update);
+    $response = $this->servicesPut($path . '/comment/' . $comment->cid, $comment_update);
 
-    $comment_load = (array)comment_load($cid);
+    $comment_load = (array)comment_load($comment->cid);
+    $comment_update = (array) $comment_update;
 
-    $comment_intersect = array_intersect_assoc($comment_load, $comment_update);
-
-    // Unset save_value as we don't have this key in arguments.
-    unset($comment_intersect['comment_body'][LANGUAGE_NONE][0]['safe_value']);
-
-    $this->assertEqual($comment_update, $comment_intersect, 'Comment updated properly.', 'CommentResource: Update');
-  }
-
-  /**
-   * Test update method.
-   *
-   * TODO: To be removed in future version.
-   * @see http://backdrop.org/node/1083242
-   */
-  function testCommentUpdateLegacy() {
-    $path = $this->endpoint->path;
-    $this->privilegedUser = $this->backdropCreateUser(array(
-      'administer services',
-      'administer comments',
-    ));
-    $this->backdropLogin($this->privilegedUser);
-    // Create node.
-    $node = $this->backdropCreateNode();
-
-    $comment_args = $this->getCommentValues($node->nid);
-
-    $comment = (object)$comment_args;
-
-    comment_save($comment);
-    $cid = $comment->cid;
-    $comment_args['cid'] = $cid;
-
-    $comment_update = $comment_args;
-    $comment_update['subject'] = $this->randomString();
-    $comment_update['comment_body'][LANGUAGE_NONE][0]['value'] = $this->randomString();
-
-    $response = $this->servicesPut($path . '/comment/' . $cid, array('data' => $comment_update));
-
-    $comment_load = (array)comment_load($cid);
-
-    $comment_intersect = array_intersect_assoc($comment_load, $comment_update);
+    $comment_intersect = array_intersect_assoc($comment_update, $comment_load);
 
     // Unset save_value as we don't have this key in arguments.
     unset($comment_intersect['comment_body'][LANGUAGE_NONE][0]['safe_value']);
@@ -304,13 +216,10 @@ class ServicesResourceCommentTests extends ServicesWebTestCase {
     // Create node with commenting.
     $node = $this->backdropCreateNode();
 
-    $comment_args = $this->getCommentValues($node->nid);
-
-    $comment = (object)$comment_args;
+    $comment = $this->getCommentValues($node->nid);
 
     comment_save($comment);
     $cid = $comment->cid;
-    $comment_args['cid'] = $cid;
 
     $response = $this->servicesDelete($path . '/comment/' . $cid);
 
@@ -329,7 +238,7 @@ class ServicesResourceCommentTests extends ServicesWebTestCase {
     $settings = array('comment' => 1);
     $node = $this->backdropCreateNode($settings);
     for ($i = 0; $i < 5; $i++) {
-      $comment = (object)$this->getCommentValues($node->nid);
+      $comment = $this->getCommentValues($node->nid);
       comment_save($comment);
     }
 
@@ -346,7 +255,7 @@ class ServicesResourceCommentTests extends ServicesWebTestCase {
     $node = $this->backdropCreateNode();
     $nid = $node->nid;
     for ($i = 0; $i < 5; $i++) {
-      $comment = (object)$this->getCommentValues($nid);
+      $comment = $this->getCommentValues($nid);
       $comment->created = REQUEST_TIME + $i;
       comment_save($comment);
       $comments[] = comment_load($comment->cid);

@@ -1227,5 +1227,24 @@ function services_autoload_info() {
   return array(
     'ServicesException' => 'includes/services.runtime.inc',
     'ServicesArgumentException' => 'includes/services.runtime.inc',
+    // tests
+    'ServicesWebTestCase' => 'tests/services.test',
+    'NoAuthEndpointTestRunner' => 'tests/functional/NoAuthEndpointTestRunner.test',
+    'ServicesResourceNodeTests' => 'tests/functional/ServicesResourceNodeTests.test',
+    'ServicesResourceUserTests' => 'tests/functional/ServicesResourceUserTests.test',
+    'ServicesResourceSystemTests' => 'tests/functional/ServicesResourceSystemTests.test',
+    'ServicesResourceCommentTests' => 'tests/functional/ServicesResourceCommentTests.test',
+    'ServicesResourceTaxonomyTests' => 'tests/functional/ServicesResourceTaxonomyTests.test',
+    'ServicesResourceFileTests' => 'tests/functional/ServicesResourceFileTests.test',
+    'ServicesResourceDisabledTests' => 'tests/functional/ServicesResourceDisabledTests.test',
+    'ServicesEndpointTests' => 'tests/functional/ServicesEndpointTests.test',
+    'ServicesParserTests' => 'tests/functional/ServicesParserTests.test',
+    'ServicesAliasTests' => 'tests/functional/ServicesAliasTests.test',
+    'ServicesXMLRPCTests' => 'tests/functional/ServicesXMLRPCTests.test',
+    'ServicesVersionTests' => 'tests/functional/ServicesVersionTests.test',
+    'ServicesArgumentsTests' => 'tests/functional/ServicesArgumentsTests.test',
+    'ServicesSecurityTests' => 'tests/functional/ServicesSecurityTests.test',
+    'ServicesSpycLibraryTests' => 'tests/unit/ServicesSpycLibraryTests.test',
+    'ServicesUITests' => 'tests/ui/ServicesUITests.test',
   );
 }

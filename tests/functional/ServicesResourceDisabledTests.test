@@ -47,6 +47,7 @@ class ServicesResourceDisabledTest extends ServicesWebTestCase {
     $endpoint = new stdClass;
     $endpoint->disabled = FALSE; /* Edit this to true to make a default endpoint disabled initially */
     $endpoint->api_version = 3;
+    $endpoint->is_new = TRUE;
     $endpoint->name = $edit['name'];
     $endpoint->server = $edit['server'];
     $endpoint->path = $edit['path'];

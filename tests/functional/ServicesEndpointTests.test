@@ -23,7 +23,7 @@ class ServicesEndpointTests extends ServicesWebTestCase {
       'administer site configuration',
     ));
     $this->backdropLogin($this->privilegedUser);
-    $this->backdropPost('admin/structure/services/add', $edit, 'Save');
+    $this->backdropPost('admin/structure/services/add', $edit, 'Save endpoint');
     $this->backdropGet($edit['path']);
   }
 
@@ -38,13 +38,12 @@ class ServicesEndpointTests extends ServicesWebTestCase {
       'administer site configuration',
     ));
     $this->backdropLogin($this->privilegedUser);
-    $this->backdropPost('admin/structure/services/add', $edit, 'Save');
+    $this->backdropPost('admin/structure/services/add', $edit, 'Save endpoint');
     $this->assertResponse('200', 'expected 200');
     $this->backdropGet('admin/structure/services');
     $this->assertResponse('200', 'expected 200');
 
     $this->assertText($edit['name'], 'Endpoint path appears');
-    $this->assertText('Normal', 'Storage is in database');
   }
 
   /**
@@ -59,7 +58,7 @@ class ServicesEndpointTests extends ServicesWebTestCase {
       'administer site configuration',
     ));
     $this->backdropLogin($this->privilegedUser);
-    $this->backdropPost('admin/structure/services/add', $edit, 'Save');
+    $this->backdropPost('admin/structure/services/add', $edit, 'Save endpoint');
     $this->assertResponse('200', 'expected 200');
 
     $this->assertText('Path to endpoint field is required.', 'Endpoint path missing error message.');
@@ -77,7 +76,7 @@ class ServicesEndpointTests extends ServicesWebTestCase {
       'administer site configuration',
     ));
     $this->backdropLogin($this->privilegedUser);
-    $this->backdropPost('admin/structure/services/add', $edit, 'Save');
+    $this->backdropPost('admin/structure/services/add', $edit, 'Save endpoint');
     $this->assertResponse('200', 'expected 200');
 
     $this->assertText('Server field is required.', 'Server missing error message.');

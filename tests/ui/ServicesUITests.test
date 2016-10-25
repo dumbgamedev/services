@@ -5,6 +5,8 @@
  * Tests for UI of Services.
  */
 
+include_once '../services.test';
+
 class ServicesUITest extends BackdropWebTestCase {
   protected $privilegedUser;
 
@@ -29,7 +31,7 @@ class ServicesUITest extends BackdropWebTestCase {
       'server' => 'rest_server',
       'path' => 'rest',
     );
-    $this->backdropPost('admin/structure/services/add', $edit, 'Save');
+    $this->backdropPost('admin/structure/services/add', $edit, 'Save endpoint');
     $this->assertText('The endpoint name can only consist of lowercase letters, underscores, and numbers.',
       'It is not possible to create endpoint with bad machine name.');
 
@@ -39,7 +41,7 @@ class ServicesUITest extends BackdropWebTestCase {
       'server' => 'rest_server',
       'path' => 'rest',
     );
-    $this->backdropPost('admin/structure/services/add', $edit, 'Save');
+    $this->backdropPost('admin/structure/services/add', $edit, 'Save endpoint');
     $this->assertText('rest', 'Endpoint create successfully.');
 
     // Try to create endpoint with same machine name.
@@ -48,7 +50,7 @@ class ServicesUITest extends BackdropWebTestCase {
       'server' => 'rest_server',
       'path' => 'rest1',
     );
-    $this->backdropPost('admin/structure/services/add', $edit, 'Save');
+    $this->backdropPost('admin/structure/services/add', $edit, 'Save endpoint');
     $this->assertText('The machine-readable name is already in use. It must be unique.',
       'It is not possible to create endpoint with existing machine name.');
 
@@ -58,7 +60,7 @@ class ServicesUITest extends BackdropWebTestCase {
       'server' => 'rest_server',
       'path' => 'rest',
     );
-    $this->backdropPost('admin/structure/services/add', $edit, 'Save');
+    $this->backdropPost('admin/structure/services/add', $edit, 'Save endpoint');
     $this->assertText('Endpoint path must be unique.', 'It is not possible to create endpoint with existing path.');
   }
 
@@ -73,7 +75,7 @@ class ServicesUITest extends BackdropWebTestCase {
       'server' => 'rest_server',
     );
 
-    $this->backdropPost('admin/structure/services/add', $endpoint_settings, 'Save');
+    $this->backdropPost('admin/structure/services/add', $endpoint_settings, 'Save endpoint');
     $this->assertResponse('200', 'Create Endpoint.');
 
     // Enable node resource index method.

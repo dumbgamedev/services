@@ -1,0 +1,107 @@
+[NoAuthEndpointTestRunner]
+name = NoAuthEndpointTestRunner
+description = TBD
+group = Services
+file = functional/NoAuthEndpointTestRunner.test
+
+[ServicesResourceNodeTests]
+name = ServicesResourceNodeTests
+description = TBD
+group = Services
+file = functional/ServicesResourceNodeTests.test
+
+[ServicesResourceUserTests]
+name = ServicesResourceUserTests
+description = TBD
+group = Services
+file = functional/ServicesResourceUserTests.test
+
+[ServicesResourceSystemTests]
+name = ServicesResourceSystemTests
+description = TBD
+group = Services
+file = functional/ServicesResourceSystemTests.test
+
+[ServicesResourceCommentTests]
+name = ServicesResourceCommentTests
+description = TBD
+group = Services
+file = functional/ServicesResourceCommentTests.test
+
+[ServicesResourceTaxonomyTests]
+name = ServicesResourceTaxonomyTests
+description = TBD
+group = Services
+file = functional/ServicesResourceTaxonomyTests.test
+
+[ServicesResourceFileTests]
+name = ServicesResourceFileTests
+description = TBD
+group = Services
+file = functional/ServicesResourceFileTests.test
+
+[ServicesResourceDisabledTest]
+name = ServicesResourceDisabledTests
+description = TBD
+group = Services
+file = functional/ServicesResourceDisabledTests.test
+
+[ServicesEndpointTests]
+name = ServicesEndpointTests
+description = TBD
+group = Services
+file = functional/ServicesEndpointTests.test
+
+[ServicesParserTests]
+name = ServicesParserTests
+description = TBD
+group = Services
+file = functional/ServicesParserTests.test
+
+[ServicesAliasTests]
+name = ServicesAliasTests
+description = TBD
+group = Services
+file = functional/ServicesAliasTests.test
+
+[ServicesXMLRPCTestCase]
+name = ServicesXMLRPCTests
+description = TBD
+group = Services
+file = functional/ServicesXMLRPCTests.test
+
+[ServicesVersionTests]
+name = ServicesVersionTests
+description = TBD
+group = Services
+file = functional/ServicesVersionTests.test
+
+[ServicesArgumentsTestCase]
+name = ServicesArgumentsTests
+description = TBD
+group = Services
+file = functional/ServicesArgumentsTests.test
+
+[ServicesSecurityTests]
+name = ServicesSecurityTests
+description = TBD
+group = Services
+file = functional/ServicesSecurityTests.test
+
+[ServicesSpycLibraryTests]
+name = ServicesSpycLibraryTests
+description = TBD
+group = Services
+file = unit/ServicesSpycLibraryTests.test
+
+[ServicesUITest]
+name = ServicesUITests
+description = TBD
+group = Services
+file = ui/ServicesUITests.test
+
+[ServicesWebTestCase]
+name = ServicesWebTestCase
+description = TBD
+group = Services
+file = services.test
