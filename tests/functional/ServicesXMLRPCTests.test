@@ -20,7 +20,7 @@ class ServicesXMLRPCTestCase extends BackdropWebTestCase {
   }
 
   public function setUp() {
-    parent::setUp('services', 'xmlrpc_server', 'services_test_resource');
+    parent::setUp('services', 'xmlrpc', 'xmlrpc_server', 'services_test_resource');
     // Set up endpoint.
     $this->endpoint =  $this->saveNewEndpoint();
   }

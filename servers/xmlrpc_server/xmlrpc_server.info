@@ -5,6 +5,7 @@ package = Services - servers
 files[] = xmlrpc_server.module
 
 dependencies[] = services
+dependencies[] = xmlrpc
 
 backdrop = 1.x
 type = module
