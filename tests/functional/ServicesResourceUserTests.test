@@ -579,7 +579,7 @@ class ServicesResourceUsertests extends ServicesWebTestCase {
     $this->assertTrue(strpos($response['status'], 'Wrong username or password') !== FALSE,
       'User cannot login with wrong username / password.', 'UserResource: Login');
 
-    $account_blocking_limit = config_get('user.flood', 'flood_user_limit';
+    $account_blocking_limit = config_get('user.flood', 'flood_user_limit');
 
     // Go through set of default error while we're having attempts
     if ($account_blocking_limit > 2) {
