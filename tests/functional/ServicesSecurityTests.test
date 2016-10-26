@@ -36,10 +36,11 @@ class ServicesSecurityTests extends ServicesWebTestCase {
   public function testSessionCSRF() {
     $variable_name = $this->randomName();
     $variable_value = $this->randomString();
+    $config_name = 'services.settings';
     $default_variable_value = $this->randomString();
-    $this->servicesPost($this->endpoint->path . '/system/set_variable', array('name' => $variable_name, 'value' => $variable_value));
+    $this->servicesPost($this->endpoint->path . '/system/set_variable', array('config_name' => $config_name, 'name' => $variable_name, 'value' => $variable_value));
 
-    $get_variable_args = array('name' => $variable_name, 'default' => $default_variable_value);
+    $get_variable_args = array('config_name' => $config_name, 'name' => $variable_name);
     $response = $this->servicesPostNoCSRFHeader($this->endpoint->path . '/system/get_variable', $get_variable_args);
     $this->assertEqual($response['status'], 'HTTP/1.1 401 Unauthorized : CSRF validation failed');
 
