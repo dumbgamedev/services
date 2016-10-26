@@ -495,7 +495,7 @@ function services_endpoint_save($endpoint) {
       $endpoint->{$endpoint_field} = array();
     }
   }
-  if ($endpoint->is_new) {
+  if (!empty($endpoint->is_new)) {
     // New record.
     $update = array();
   }

@@ -438,7 +438,7 @@ function services_endpoint_edit_form($form, &$form_state, $endpoint = NULL) {
     '#type' => 'submit',
     '#value' => empty($endpoint) ? t('Save endpoint') : t('Update endpoint'),
     '#validate' => array(
-      //'services_endpoint_edit_form_validate',
+      'services_endpoint_edit_form_validate',
     ),
     '#submit' => array(
       'services_endpoint_edit_form_submit',
