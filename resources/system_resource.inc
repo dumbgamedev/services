@@ -18,22 +18,22 @@ function _system_resource_definition() {
         'get_variable' => array(
           'help'   => 'Returns the value of a system variable using config_get() ).',
           'file' => array('type' => 'inc', 'module' => 'services', 'name' => 'resources/system_resource'),
-          'callback' => 'variable_get',
+          'callback' => 'config_get',
           'access arguments' => array('get a system variable'),
           'access arguments append' => FALSE,
           'args' => array(
+            array(
+              'config_name' => 'config_name',
+              'optional' => FALSE,
+              'source' => array('data' => 'config_name'),
+              'description' => t('The name of the config file where the variable to return is stored.'),
+              'type' => 'string',
+            ),
             array(
               'name' => 'name',
               'optional' => FALSE,
               'source' => array('data' => 'name'),
               'description' => t('The name of the variable to return.'),
-              'type' => 'string',
-            ),
-            array(
-              'name' => 'default',
-              'optional' => TRUE,
-              'source' => array('data' => 'default'),
-              'description' => t('The default value to use if this variable has never been set.'),
               'type' => 'string',
             ),
           ),
@@ -45,6 +45,13 @@ function _system_resource_definition() {
           'access arguments' => array('set a system variable'),
           'access arguments append' => FALSE,
           'args' => array(
+            array(
+              'config_name' => 'config_name',
+              'optional' => FALSE,
+              'source' => array('data' => 'config_name'),
+              'description' => t('The name of the config file where the variable should be stored.'),
+              'type' => 'string',
+            ),
             array(
               'name' => 'name',
               'optional' => FALSE,
@@ -61,25 +68,42 @@ function _system_resource_definition() {
             ),
           ),
         ),
-        // 'del_variable' => array(
-          // 'help'   => 'Deletes a system variable using variable_del().',
-          // 'file' => array('type' => 'inc', 'module' => 'services', 'name' => 'resources/system_resource'),
-          // 'callback' => 'variable_del',
-          // 'access arguments' => array('set a system variable'),
-          // 'access arguments append' => FALSE,
-          // 'args' => array(
-            // array(
-              // 'name' => 'name',
-              // 'optional' => FALSE,
-              // 'source' => array('data' => 'name'),
-              // 'description' => t('The name of the variable to delete.'),
-              // 'type' => 'string',
-            // ),
-          // ),
-        // ),
+        'del_variable' => array(
+          'help'   => 'Deletes a system variable using variable_del().',
+          'file' => array('type' => 'inc', 'module' => 'services', 'name' => 'resources/system_resource'),
+          'callback' => '_services_config_clear',
+          'access arguments' => array('set a system variable'),
+          'access arguments append' => FALSE,
+          'args' => array(
+            array(
+              'config_name' => 'config_name',
+              'optional' => FALSE,
+              'source' => array('data' => 'config_name'),
+              'description' => t('The name of the config file where the variable is stored.'),
+              'type' => 'string',
+            ),
+            array(
+              'name' => 'name',
+              'optional' => FALSE,
+              'source' => array('data' => 'name'),
+              'description' => t('The name of the variable to delete.'),
+              'type' => 'string',
+            ),
+          ),
+        ),
       ),
     ),
   );
+}
+
+/**
+ * Clears a config variable by deleting the key from the config file.
+ */
+function _services_config_clear($config_name, $name) {
+  $config = config($config_name);
+  $config->clear($name);
+  $config->save();
+  return $config->get();
 }
 
 /**

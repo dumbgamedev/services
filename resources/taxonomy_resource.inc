@@ -125,7 +125,7 @@ function _taxonomy_resource_definition() {
               'description' => 'Additional query options.',
               'default value' => array(
                 'orderby' => array(
-                  'vid' => 'DESC',
+                  'vocabulary' => 'DESC',
                   'weight' => 'DESC',
                   'name' => 'DESC'
                 )
@@ -186,11 +186,11 @@ function _taxonomy_resource_definition() {
           'callback' => '_taxonomy_vocabulary_resource_retrieve',
           'args' => array(
             array(
-              'name' => 'vid',
+              'name' => 'machine_name',
               'optional' => FALSE,
               'source' => array('path' => 0),
               'type' => 'int',
-              'description' => 'The vid of the taxonomy vocabulary to get',
+              'description' => 'The machine_name of the taxonomy vocabulary to get',
             ),
           ),
           'access arguments' => array('access content'),
@@ -216,7 +216,7 @@ function _taxonomy_resource_definition() {
           'callback' => '_taxonomy_vocabulary_resource_update',
           'args' => array(
             array(
-              'name' => 'vid',
+              'name' => 'machine_name',
               'optional' => FALSE,
               'source' => array('path' => 0),
               'description' => 'The unique identifier for this taxonomy vocabulary.',
@@ -238,7 +238,7 @@ function _taxonomy_resource_definition() {
           'callback' => '_taxonomy_vocabulary_resource_delete',
           'args' => array(
             array(
-              'name' => 'vid',
+              'name' => 'machine_name',
               'optional' => FALSE,
               'source' => array('path' => 0),
               'type' => 'int',
@@ -324,10 +324,10 @@ function _taxonomy_resource_definition() {
           'callback' => 'taxonomy_service_get_tree',
           'args'     => array(
             array(
-              'name'         => 'vid',
+              'name'         => 'machine_name',
               'type'         => 'int',
               'description'  => t('The vocabulary id to retrieve.'),
-              'source'       => array('data' => 'vid'),
+              'source'       => array('data' => 'machine_name'),
               'optional'     => FALSE,
             ),
             array(
@@ -392,7 +392,7 @@ function _taxonomy_term_resource_create($term) {
   // Adds backwards compatability with regression fixed in #1083242
   $term = _services_arg_value($term, 'term');
 
-  $term = (object)$term;
+  $term = entity_create('taxonomy_term', $term);
   return taxonomy_term_save($term);
 }
 
@@ -412,7 +412,7 @@ function _taxonomy_term_resource_update($tid, $term) {
   // Adds backwards compatability with regression fixed in #1083242
   $term = _services_arg_value($term, 'term');
 
-  $term = (object) $term;
+  $term = entity_create('taxonomy_term', $term);
   $term->tid = $tid;
   return taxonomy_term_save($term);
 }
@@ -435,15 +435,15 @@ function _taxonomy_term_resource_delete($tid) {
 /**
  * Return the results of taxonomy_vocabulary_load() for a specified vocabulary id.
  *
- * @param $vid
+ * @param $machine_name
  *   Unique identifier for the taxonomy term to retrieve.
  * @return
  *   A vocabulary object or FALSE.
  *
  * @see taxonomy_vocabulary_load()
  */
-function _taxonomy_vocabulary_resource_retrieve($vid) {
-  return taxonomy_vocabulary_load($vid);
+function _taxonomy_vocabulary_resource_retrieve($machine_name) {
+  return taxonomy_vocabulary_load($machine_name);
 }
 
 /**
@@ -479,14 +479,14 @@ function _taxonomy_vocabulary_resource_create($vocabulary) {
   // Adds backwards compatability with regression fixed in #1083242
   $vocabulary = _services_arg_value($vocabulary, 'vocabulary');
 
-  $vocabulary = (object) $vocabulary;
+  $vocabulary = new TaxonomyVocabulary($vocabulary);
   return taxonomy_vocabulary_save($vocabulary);
 }
 
 /**
  * Update a taxonomy vocabulary based on submitted values.
  *
- * @param $vid
+ * @param $machine_name
  *   Unique identifier for the taxonomy term to retrieve.
  * @param $vocabulary
  *   Array of values for the taxonomy vocabulary.
@@ -495,27 +495,27 @@ function _taxonomy_vocabulary_resource_create($vocabulary) {
  *
  * @see taxonomy_vocabulary_save()
  */
-function _taxonomy_vocabulary_resource_update($vid, $vocabulary) {
+function _taxonomy_vocabulary_resource_update($machine_name, $vocabulary) {
   // Adds backwards compatability with regression fixed in #1083242
   $vocabulary = _services_arg_value($vocabulary, 'vocabulary');
 
-  $vocabulary = (object) $vocabulary;
-  $vocabulary->vid = $vid;
+  $vocabulary = new TaxonomyVocabulary($vocabulary);
+  $vocabulary->machine_name = $machine_name;
   return taxonomy_vocabulary_save($vocabulary);
 }
 
 /**
  * Delete a taxonomy vocabulary.
  *
- * @param $vid
+ * @param $machine_name
  *   Unique identifier for the taxonomy term to retrieve.
  * @return
  *   Status constant indicating deletion.
  *
  * @see taxonomy_del_vocabulary()
  */
-function _taxonomy_vocabulary_resource_delete($vid) {
-  return taxonomy_vocabulary_delete($vid);
+function _taxonomy_vocabulary_resource_delete($machine_name) {
+  return taxonomy_vocabulary_delete($machine_name);
 }
 
 
@@ -525,10 +525,10 @@ function _taxonomy_vocabulary_resource_delete($vid) {
  *
  * @see taxonomy_get_tree()
  */
-function taxonomy_service_get_tree($vid, $parent = 0, $max_depth = NULL, $load_entities = 0) {
-  $terms = taxonomy_get_tree($vid, $parent, $max_depth, $load_entities);
+function taxonomy_service_get_tree($machine_name, $parent = 0, $max_depth = NULL, $load_entities = 0) {
+  $terms = taxonomy_get_tree($machine_name, $parent, $max_depth, $load_entities);
   if (empty($terms)) {
-    return services_error(t('No vocabulary with id @vid found.', array('@vid' => $vid)), 404);
+    return services_error(t('No vocabulary with id @machine_name found.', array('@machine_name' => $machine_name)), 404);
   }
   return $terms;
 }
@@ -588,10 +588,10 @@ function _taxonomy_resource_update_access($tid, $term) {
   $term = _services_arg_value($term, 'term');
 
   $term = (object) $term;
-  if (!isset($term->vid)) {
-    return services_error(t('Term object needs vid property.'), 406);
+  if (!isset($term->vocabulary)) {
+    return services_error(t('Term object needs vocabulary property.'), 406);
   }
-  return user_access('edit terms in ' . $term->vid) || user_access('administer taxonomy');
+  return user_access('edit terms in ' . $term->vocabulary) || user_access('administer taxonomy');
 }
 
 /**
@@ -607,7 +607,7 @@ function _taxonomy_resource_create_access($term) {
   $term = _services_arg_value($term, 'term');
 
   $term = (object) $term;
-  return user_access('edit terms in ' . $term->vid) || user_access('administer taxonomy');
+  return user_access('edit terms in ' . $term->vocabulary) || user_access('administer taxonomy');
 }
 
 /**
@@ -623,7 +623,7 @@ function _taxonomy_resource_delete_access($tid) {
   if (!$term) {
     return services_error(t('There is no term with id @tid.', array('@tid' => $tid)), 406);
   }
-  return user_access('delete terms in ' . $term->vid) || user_access('administer taxonomy');
+  return user_access('delete terms in ' . $term->vocabulary) || user_access('administer taxonomy');
 }
 
 /**
@@ -631,10 +631,10 @@ function _taxonomy_resource_delete_access($tid) {
  *
  * An example request might look like
  *
- * http://domain/endpoint/taxonomy_term?fields=tid,name&parameters[tid]=7&parameters[vid]=1
+ * http://domain/endpoint/taxonomy_term?fields=tid,name&parameters[tid]=7&parameters[vocabulary]=1
  *
  * This would return an array of objects with only tid and name defined, where
- * tid = 7 and vid = 1.
+ * tid = 7 and vocabulary = 1.
  *
  * @param $page
  *   Page number of results to return (in pages of 20).
@@ -669,10 +669,10 @@ function _taxonomy_term_resource_index($page, $fields, $parameters, $page_size, 
  *
  * An example request might look like
  *
- * http://domain/endpoint/taxonomy_vocabulary?fields=vid,name&parameters[vid]=2
+ * http://domain/endpoint/taxonomy_vocabulary?fields=machine_name,name&parameters[machine_name]=2
  *
- * This would return an array of objects with only vid and name defined, where
- * vid = 2.
+ * This would return an array of objects with only machine_name and name defined, where
+ * machine_name = 2.
  *
  * @param $page
  *   Page number of results to return (in pages of 20).
@@ -700,5 +700,5 @@ function _taxonomy_vocabulary_resource_index($page, $fields, $parameters, $page_
 
   $results = $taxonomy_select->execute();
 
-  return services_resource_build_index_list($results, 'taxonomy_vocabulary', 'vid');
+  return services_resource_build_index_list($results, 'taxonomy_vocabulary', 'machine_name');
 }

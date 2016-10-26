@@ -52,34 +52,35 @@ class ServicesResourceTaxonomyTests extends ServicesWebTestCase {
     $count = 50;
     for ($i = 0; $i < $count; $i++) {
       $vocabulary = $this->createVocabulary();
-      $vocabularys[$vocabulary['vid']] = $vocabulary;
+      $vocabularys[$vocabulary['machine_name']] = $vocabulary;
     }
     $vocabulary = taxonomy_vocabulary_load(1);
     $vocabularys[1] = (array) $vocabulary;
     // Get the content.
     $page_count = ceil(count($vocabularys) / 20);
     $retrieved_terms = array();
+    $retrieved_vocabularys = array();
     for ($page = 0; $page < $page_count; $page++) {
-      $responseArray = $this->servicesGet($this->endpoint->path . '/taxonomy_vocabulary', array('page' => $page, 'fields' => 'vid,name'));
+      $responseArray = $this->servicesGet($this->endpoint->path . '/taxonomy_vocabulary', array('page' => $page, 'fields' => 'machine_name,name'));
       $this->assertTrue(count($responseArray['body']) <= 20, 'Correct number of items returned');
 
       // Store the returned comment IDs.
       foreach ($responseArray['body'] as $vocabulary) {
-        if (isset($retrieved_vocabularys[$vocabulary->vid])) {
-          $this->fail(format_string('Duplicate vocabulary @vid returned.', array('@vid' => $vocabulary->vid)));
+        if (isset($retrieved_vocabularys[$vocabulary->machine_name])) {
+          $this->fail(format_string('Duplicate vocabulary @machine_name returned.', array('@machine_name' => $vocabulary->machine_name)));
         }
-        $retrieved_vocabularys[$vocabulary->vid] = TRUE;
+        $retrieved_vocabularys[$vocabulary->machine_name] = TRUE;
 
-        $this->assertTrue($vocabularys[$vocabulary->vid]['name'] == $vocabulary->name,
+        $this->assertTrue($vocabularys[$vocabulary->machine_name]['name'] == $vocabulary->name,
           'Successfully received vocabulary Name info', 'TaxonomyVocabularyResource: Index');
       }
     }
     // We should have got all the comments.
-    $expected_vids = array_keys($vocabularys);
-    sort($expected_vids);
-    $retrieved_vids = array_keys($retrieved_vocabularys);
-    sort($retrieved_vids);
-    $this->assertEqual($expected_vids, $retrieved_vids, 'Retrieved all vocabularys');
+    $expected_machine_names = array_keys($vocabularys);
+    sort($expected_machine_names);
+    $retrieved_machine_names = array_keys($retrieved_vocabularys);
+    sort($retrieved_machine_names);
+    $this->assertEqual($expected_machine_names, $retrieved_machine_names, 'Retrieved all vocabularys');
 
     // The n+1 page should be empty.
     $responseArray = $this->servicesGet($this->endpoint->path . '/taxonomy_vocabulary', array('page' => $page_count + 1));
@@ -99,7 +100,7 @@ class ServicesResourceTaxonomyTests extends ServicesWebTestCase {
     $count = 50;
     $vocabulary = $this->createVocabulary();
     for ($i = 0; $i < $count; $i++) {
-      $term = $this->createTerm($vocabulary['vid']);
+      $term = $this->createTerm($vocabulary['machine_name']);
       $terms[$term['tid']] = $term;
     }
     
@@ -130,7 +131,7 @@ class ServicesResourceTaxonomyTests extends ServicesWebTestCase {
     // The n+1 page should be empty.
     $responseArray = $this->servicesGet($this->endpoint->path . '/taxonomy_term', array('page' => $page_count + 1));
     $this->assertEqual(count($responseArray['body']), 0, 'The n+1 page is empty');
-    taxonomy_vocabulary_delete($vocabulary['vid']);
+    taxonomy_vocabulary_delete($vocabulary['machine_name']);
   }
 
   /**
@@ -138,10 +139,11 @@ class ServicesResourceTaxonomyTests extends ServicesWebTestCase {
    */
   function testVocabularyCreate() {
     $path = $this->endpoint->path;
+    $machine_name = $this->randomName();
 
     $vocabulary = array(
       'name'        => $this->randomName(),
-      'machine_name'=> $this->randomName(),
+      'machine_name'=> $machine_name,
       'description' => $this->randomString(),
       'hierarchy'   => 1,
       'module'      => 'services',
@@ -150,12 +152,7 @@ class ServicesResourceTaxonomyTests extends ServicesWebTestCase {
 
     $response = $this->servicesPost($path . '/taxonomy_vocabulary', $vocabulary);
 
-    $query = db_select('taxonomy_vocabulary', 'v')
-      ->fields('v', array('vid'))
-      ->condition('v.name', $vocabulary['name']);
-    $vid = $query->execute()->fetchField();
-
-    $vocabulary_load = (array)taxonomy_vocabulary_load($vid);
+    $vocabulary_load = (array)taxonomy_vocabulary_load($machine_name);
     $vocabulary_intersect = array_intersect_assoc($vocabulary, $vocabulary_load);
 
     $this->assertEqual($vocabulary, $vocabulary_intersect, 'Taxonomy vocabulary created properly.', 'TaxonomyVocabularyResource: Create');
@@ -169,10 +166,11 @@ class ServicesResourceTaxonomyTests extends ServicesWebTestCase {
    */
   function testVocabularyCreateLegacy() {
     $path = $this->endpoint->path;
+    $machine_name = $this->randomName();
 
     $vocabulary = array(
       'name'        => $this->randomName(),
-      'machine_name'=> $this->randomName(),
+      'machine_name'=> $machine_name,
       'description' => $this->randomString(),
       'hierarchy'   => 1,
       'module'      => 'services',
@@ -181,12 +179,7 @@ class ServicesResourceTaxonomyTests extends ServicesWebTestCase {
 
     $response = $this->servicesPost($path . '/taxonomy_vocabulary', array('vocabulary' => $vocabulary));
 
-    $query = db_select('taxonomy_vocabulary', 'v')
-      ->fields('v', array('vid'))
-      ->condition('v.name', $vocabulary['name']);
-    $vid = $query->execute()->fetchField();
-
-    $vocabulary_load = (array)taxonomy_vocabulary_load($vid);
+    $vocabulary_load = (array)taxonomy_vocabulary_load($machine_name);
     $vocabulary_intersect = array_intersect_assoc($vocabulary, $vocabulary_load);
 
     $this->assertEqual($vocabulary, $vocabulary_intersect, 'Taxonomy vocabulary created properly.', 'TaxonomyVocabularyResource: Create (Legacy)');
@@ -199,9 +192,9 @@ class ServicesResourceTaxonomyTests extends ServicesWebTestCase {
     $path = $this->endpoint->path;
 
     $vocabulary = $this->createVocabulary();
-    $vid = $vocabulary['vid'];
+    $machine_name = $vocabulary['machine_name'];
 
-    $response = $this->servicesGet($path . '/taxonomy_vocabulary/' . $vid);
+    $response = $this->servicesGet($path . '/taxonomy_vocabulary/' . $machine_name);
     $vocabulary_retrieve = (array)$response['body'];
 
     $vocabulary_intersect = array_intersect_assoc($vocabulary, $vocabulary_retrieve);
@@ -216,16 +209,16 @@ class ServicesResourceTaxonomyTests extends ServicesWebTestCase {
     $path = $this->endpoint->path;
 
     $vocabulary = $this->createVocabulary();
-    $vid = $vocabulary['vid'];
+    $vocabulary_name = $vocabulary['machine_name'];
 
     $vocabulary['name'] = $this->randomName();
     $vocabulary['description'] = $this->randomString();
 
-    $response = $this->servicesPUT($path . '/taxonomy_vocabulary/' . $vid, $vocabulary);
+    $response = $this->servicesPUT($path . '/taxonomy_vocabulary/' . $vocabulary_name, $vocabulary);
 
-    // Load vocabulary from database. We use entity_load to reset static cache.
-    $vocabularies_load = entity_load('taxonomy_vocabulary', array($vid), array(), TRUE);
-    $vocabulary_load = (array)array_pop($vocabularies_load);
+    // Load vocabulary from database.
+    backdrop_static_reset('taxonomy_vocabulary_load_multiple');
+    $vocabulary_load = taxonomy_vocabulary_load($vocabulary_name);
 
     $vocabulary_intersect = array_intersect_assoc($vocabulary, $vocabulary_load);
     $this->assertEqual($vocabulary, $vocabulary_intersect, 'Taxonomy vocabulary updated properly.', 'TaxonomyVocabularyResource: Update');
@@ -241,16 +234,16 @@ class ServicesResourceTaxonomyTests extends ServicesWebTestCase {
     $path = $this->endpoint->path;
 
     $vocabulary = $this->createVocabulary();
-    $vid = $vocabulary['vid'];
+    $vocabulary_name = $vocabulary['machine_name'];
 
     $vocabulary['name'] = $this->randomName();
     $vocabulary['description'] = $this->randomString();
 
-    $response = $this->servicesPUT($path . '/taxonomy_vocabulary/' . $vid, array('vocabulary' => $vocabulary));
+    $response = $this->servicesPUT($path . '/taxonomy_vocabulary/' . $vocabulary_name, array('vocabulary' => $vocabulary));
 
-    // Load vocabulary from database. We use entity_load to reset static cache.
-    $vocabularies_load = entity_load('taxonomy_vocabulary', array($vid), array(), TRUE);
-    $vocabulary_load = (array)array_pop($vocabularies_load);
+    // Load vocabulary from database.
+    backdrop_static_reset('taxonomy_vocabulary_load_multiple');
+    $vocabulary_load = taxonomy_vocabulary_load($vocabulary_name);
 
     $vocabulary_intersect = array_intersect_assoc($vocabulary, $vocabulary_load);
     $this->assertEqual($vocabulary, $vocabulary_intersect,
@@ -263,13 +256,13 @@ class ServicesResourceTaxonomyTests extends ServicesWebTestCase {
   function testVocabularyDelete() {
     $path = $this->endpoint->path;
     $vocabulary = $this->createVocabulary();
-    $vid = $vocabulary['vid'];
+    $vocabulary_name = $vocabulary['machine_name'];
 
-    $this->servicesDelete($path . '/taxonomy_vocabulary/' . $vid);
+    $this->servicesDelete($path . '/taxonomy_vocabulary/' . $vocabulary_name);
 
-    // Load vocabulary from database. We use entity_load to reset static cache.
-    $vocabularies_load = entity_load('taxonomy_vocabulary', array($vid), array(), TRUE);
-    $vocabulary_load = (array)array_pop($vocabularies_load);
+    // Load vocabulary from database.
+    backdrop_static_reset('taxonomy_vocabulary_load_multiple');
+    $vocabulary_load = taxonomy_vocabulary_load($vocabulary_name);
 
     $this->assertTrue(empty($vocabulary_load), 'Taxonomy vocabulary deleted properly.', 'TaxonomyVocabularyResource: Delete');
   }
@@ -280,7 +273,7 @@ class ServicesResourceTaxonomyTests extends ServicesWebTestCase {
   function testVocabularyGetTree() {
     $path = $this->endpoint->path;
     $vocabulary = $this->createVocabulary();
-    $vid = $vocabulary['vid'];
+    $machine_name = $vocabulary['machine_name'];
 
     $part_tree_parent = 0;
 
@@ -288,16 +281,16 @@ class ServicesResourceTaxonomyTests extends ServicesWebTestCase {
     for ($i = 0; $i < 10; $i++) {
       $query = db_select('taxonomy_term_data', 'td')
         ->fields('td', array('tid'))
-        ->condition('td.vid', $vid)
+        ->condition('td.vocabulary', $machine_name)
         ->orderRandom()
         ->range(0,1);
       $tid = $query->execute()->fetchField();
       $parent = rand(0, 1) * $tid;
-      $edit = (object)array(
+      $edit = entity_create('taxonomy_term', array(
         'name'    => $this->randomName(),
         'parent'  => $parent,
-        'vid'     => $vid,
-      );
+        'vocabulary'     => $machine_name,
+      ));
       taxonomy_term_save($edit);
 
       if (!empty($parent)) {
@@ -305,48 +298,48 @@ class ServicesResourceTaxonomyTests extends ServicesWebTestCase {
       }
     }
     // Add term as grandchild to test maxdepth.
-    $children = taxonomy_get_children($part_tree_parent);
-    $edit = (object)array(
+    $children = taxonomy_term_load_children($part_tree_parent);
+    $edit = entity_create('taxonomy_term', array(
       'name'    => $this->randomName(),
       'parent'  => key($children),
-      'vid'     => $vid,
-    );
+      'vocabulary'     => $machine_name,
+    ));
     taxonomy_term_save($edit);
 
     // Compare full tree.
-    $vocabulary_tree = taxonomy_get_tree($vid);
-    $response = $this->servicesPost($path . '/taxonomy_vocabulary/getTree', array('vid' => $vid));
+    $vocabulary_tree = taxonomy_get_tree($machine_name);
+    $response = $this->servicesPost($path . '/taxonomy_vocabulary/getTree', array('vocabulary' => $machine_name));
     $vocabulary_tree_response = $response['body'];
     $this->assertEqual($vocabulary_tree, $vocabulary_tree_response,
       'Vocabulary full tree received properly.', 'TaxonomyVocabularyResource: getTree');
 
     // Compare full tree with loading of full entities.
-    $vocabulary_tree = taxonomy_get_tree($vid, 0, NULL, TRUE);
-    $response = $this->servicesPost($path . '/taxonomy_vocabulary/getTree', array('vid' => $vid, 'load_entities' => 1));
+    $vocabulary_tree = taxonomy_get_tree($machine_name, 0, NULL, TRUE);
+    $response = $this->servicesPost($path . '/taxonomy_vocabulary/getTree', array('vocabulary' => $machine_name, 'load_entities' => 1));
     $vocabulary_tree_response = $response['body'];
     $this->assertEqual($vocabulary_tree, $vocabulary_tree_response,
       'Vocabulary full tree with loaded entities received properly.', 'TaxonomyVocabularyResource: getTree');
 
     // Compare part tree.
-    $vocabulary_tree = taxonomy_get_tree($vid, $part_tree_parent);
+    $vocabulary_tree = taxonomy_get_tree($machine_name, $part_tree_parent);
     $response = $this->servicesPost($path . '/taxonomy_vocabulary/getTree',
-      array('vid' => $vid, 'parent' => $part_tree_parent));
+      array('vocabulary' => $machine_name, 'parent' => $part_tree_parent));
     $vocabulary_tree_response = $response['body'];
     $this->assertEqual($vocabulary_tree, $vocabulary_tree_response,
       'Vocabulary part tree received properly.', 'TaxonomyVocabularyResource: getTree');
 
     // Compare part tree with maxdepth = 1.
-    $vocabulary_tree = taxonomy_get_tree($vid, $part_tree_parent, 1);
+    $vocabulary_tree = taxonomy_get_tree($machine_name, $part_tree_parent, 1);
     $response = $this->servicesPost($path . '/taxonomy_vocabulary/getTree',
-      array('vid' => $vid, 'parent' => $part_tree_parent, 'maxdepth' => 1));
+      array('vocabulary' => $machine_name, 'parent' => $part_tree_parent, 'maxdepth' => 1));
     $vocabulary_tree_response = $response['body'];
     $this->assertEqual($vocabulary_tree, $vocabulary_tree_response,
       'Vocabulary part tree with depth received properly.', 'TaxonomyVocabularyResource: getTree');
 
     // Compare part tree with maxdepth = 1 and loading of full entities.
-    $vocabulary_tree = taxonomy_get_tree($vid, $part_tree_parent, 1, TRUE);
+    $vocabulary_tree = taxonomy_get_tree($machine_name, $part_tree_parent, 1, TRUE);
     $response = $this->servicesPost($path . '/taxonomy_vocabulary/getTree',
-      array('vid' => $vid, 'parent' => $part_tree_parent, 'maxdepth' => 1, 'load_entities' => 1));
+      array('vocabulary' => $machine_name, 'parent' => $part_tree_parent, 'maxdepth' => 1, 'load_entities' => 1));
     $vocabulary_tree_response = $response['body'];
     $this->assertEqual($vocabulary_tree, $vocabulary_tree_response,
       'Vocabulary part tree with depth and loaded entities received properly.', 'TaxonomyVocabularyResource: getTree');
@@ -361,7 +354,7 @@ class ServicesResourceTaxonomyTests extends ServicesWebTestCase {
     $vocabulary = $this->createVocabulary();
 
     $term = array(
-      'vid' => $vocabulary['vid'],
+      'vocabulary' => $vocabulary['machine_name'],
       'name' => $this->randomName(),
       'description' => $this->randomString(),
       'weight' => rand(0, 100),
@@ -371,7 +364,7 @@ class ServicesResourceTaxonomyTests extends ServicesWebTestCase {
     $response = $this->servicesPost($path . '/taxonomy_term', $term);
 
     // Load term by name.
-    $term_by_name = (array)current(taxonomy_get_term_by_name($term['name']));
+    $term_by_name = (array)current(taxonomy_term_load_multiple_by_name($term['name']));
     $term_intersect = array_intersect_assoc($term, $term_by_name);
 
     // As term_intersect will not have parent, we unset this property.
@@ -393,7 +386,7 @@ class ServicesResourceTaxonomyTests extends ServicesWebTestCase {
     $vocabulary = $this->createVocabulary();
 
     $term = array(
-      'vid' => $vocabulary['vid'],
+      'vocabulary' => $vocabulary['machine_name'],
       'name' => $this->randomName(),
       'description' => $this->randomString(),
       'weight' => rand(0, 100),
@@ -403,7 +396,7 @@ class ServicesResourceTaxonomyTests extends ServicesWebTestCase {
     $response = $this->servicesPost($path . '/taxonomy_term', array('term' => $term));
 
     // Load term by name.
-    $term_by_name = (array)current(taxonomy_get_term_by_name($term['name']));
+    $term_by_name = (array)current(taxonomy_term_load_multiple_by_name($term['name']));
     $term_intersect = array_intersect_assoc($term, $term_by_name);
 
     // As term_intersect will not have parent, we unset this property.
@@ -421,7 +414,7 @@ class ServicesResourceTaxonomyTests extends ServicesWebTestCase {
     $path = $this->endpoint->path;
 
     $vocabulary = $this->createVocabulary();
-    $term = $this->createTerm($vocabulary['vid']);
+    $term = $this->createTerm($vocabulary['machine_name']);
 
     $response = $this->servicesGet($path . '/taxonomy_term/' . $term['tid']);
     $term_retrieve = (array)$response['body'];
@@ -436,11 +429,11 @@ class ServicesResourceTaxonomyTests extends ServicesWebTestCase {
     $path = $this->endpoint->path;
 
     $vocabulary = $this->createVocabulary();
-    $term = $this->createTerm($vocabulary['vid']);
+    $term = $this->createTerm($vocabulary['machine_name']);
 
     $term_update_data = array(
       'name' => $this->randomName(),
-      'vid'  => $term['vid'],
+      'vocabulary'  => $term['vocabulary'],
     );
 
     $this->servicesPut($path . '/taxonomy_term/' . $term['tid'], $term_update_data);
@@ -462,11 +455,11 @@ class ServicesResourceTaxonomyTests extends ServicesWebTestCase {
     $path = $this->endpoint->path;
 
     $vocabulary = $this->createVocabulary();
-    $term = $this->createTerm($vocabulary['vid']);
+    $term = $this->createTerm($vocabulary['machine_name']);
 
     $term_update_data = array(
       'name' => $this->randomName(),
-      'vid'  => $term['vid'],
+      'vocabulary'  => $term['vocabulary'],
     );
 
     $this->servicesPut($path . '/taxonomy_term/' . $term['tid'], array('term' => $term_update_data));
@@ -485,7 +478,7 @@ class ServicesResourceTaxonomyTests extends ServicesWebTestCase {
     $path = $this->endpoint->path;
 
     $vocabulary = $this->createVocabulary();
-    $term = $this->createTerm($vocabulary['vid']);
+    $term = $this->createTerm($vocabulary['machine_name']);
 
     $this->servicesDelete($path . '/taxonomy_term/' . $term['tid']);
 
@@ -499,7 +492,7 @@ class ServicesResourceTaxonomyTests extends ServicesWebTestCase {
   function testTermSelectNodes() {
     $path = $this->endpoint->path;
 
-    $vocabulary = (object)array(
+    $vocabulary = new TaxonomyVocabulary(array(
       'name'        => $this->randomName(),
       'machine_name'=> 'text_vocabulary',
       'description' => $this->randomString(),
@@ -511,11 +504,11 @@ class ServicesResourceTaxonomyTests extends ServicesWebTestCase {
       'module'      => 'services',
       'weight'      => 0,
       'nodes'       => array('page' => 'page'),
-    );
+    ));
     taxonomy_vocabulary_save($vocabulary);
 
     $query = db_select('taxonomy_vocabulary', 'v')
-      ->fields('v', array('vid'))
+      ->fields('v', array('machine_name'))
       ->condition('v.name', $vocabulary->name);
     $vid = $query->execute()->fetchField();
 
@@ -621,38 +614,34 @@ class ServicesResourceTaxonomyTests extends ServicesWebTestCase {
    * Helper. Create taxonomy vocabulary.
    */
   function createVocabulary() {
-    $vocabulary = (object)array(
+    $vocabulary = new TaxonomyVocabulary(array(
       'name'        => $this->randomName(),
-      'machine_name'=> $this->randomName(),
+      'machine_name' => backdrop_strtolower($this->randomName()),
       'description' => $this->randomString(),
       'hierarchy'   => 1,
       'module'      => 'services',
       'weight'      => 0,
-    );
+    ));
     taxonomy_vocabulary_save($vocabulary);
-    $query = db_select('taxonomy_vocabulary', 'v')
-      ->fields('v', array('vid'))
-      ->condition('v.name', $vocabulary->name);
-    $vid = $query->execute()->fetchField();
 
-    return (array)taxonomy_vocabulary_load($vid);
+    return (array)$vocabulary;
   }
 
   /**
    * Helper. Create taxonomy term.
    */
   function createTerm($vid) {
-    $term = (object)array(
-      'vid' => $vid,
+    $term = entity_create('taxonomy_term', array(
+      'vocabulary' => $vid,
       'name' => $this->randomName(),
       'description' => $this->randomString(),
       'weight' => rand(0, 100),
       'parent' => NULL,
-    );
+    ));
     taxonomy_term_save($term);
 
     // Load term by name.
-    return (array)current(taxonomy_get_term_by_name($term->name));
+    return (array)current(taxonomy_term_load_multiple_by_name($term->name));
   }
 
   /**

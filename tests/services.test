@@ -63,7 +63,6 @@ class ServicesWebTestCase extends BackdropWebTestCase {
     $i = 0;
     foreach ($filepath as $path) {
       $post['files[file_contents' . $i . ']'] = '@' . config_get('system.core', 'file_public_path') . '/' . file_uri_target($path);
-      debug($post);
       $i++;
     }
 
