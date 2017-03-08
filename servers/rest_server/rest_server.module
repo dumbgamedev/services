@@ -55,7 +55,6 @@ function rest_server_request_parsers() {
     $parsers = array(
       'application/x-www-form-urlencoded' => 'ServicesParserURLEncoded',
       'application/json' => 'ServicesParserJSON',
-      'application/vnd.php.serialized' => 'ServicesParserPHP',
       'multipart/form-data' => 'ServicesParserMultipart',
       'application/xml' => 'ServicesParserXML',
       'text/xml' => 'ServicesParserXML',
@@ -202,7 +201,7 @@ function rest_server_autoload_info() {
     'RESTServer' => 'includes/RESTServer.inc',
     'ServicesContentTypeNegotiator' => 'includes/ServicesContentTypeNegotiator.inc',
     'ServicesContentTypeNegotiatorInterface' => 'includes/ServicesContentTypeNegotiator.inc',
-    
+
     'ServicesContext' => 'includes/ServicesContext.inc',
     'ServicesContextInterface' => 'includes/ServicesContext.inc',
 
@@ -222,7 +221,7 @@ function rest_server_autoload_info() {
     'ServicesParserYAML' => 'includes/ServicesParser.inc',
     'ServicesParserMultipart' => 'includes/ServicesParser.inc',
     'ServicesParserInterface' => 'includes/ServicesParser.inc',
-    
+
     'ServicesRESTServerFactory' => 'includes/ServicesRESTServerFactory.inc',
 
     'Mimeparse' => 'lib/mimeparse.inc',
