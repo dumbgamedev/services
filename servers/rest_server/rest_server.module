@@ -178,7 +178,7 @@ function _rest_server_add_default_and_remove_unknown(&$array, $keys, $default) {
 function rest_server_libraries_info() {
   $libraries['spyc'] = array(
     'name' => 'Spyc',
-    'version' => '2.0.0',
+    'version' => '1.0.0',
     'vendor url' => 'https://github.com/mustangostang/spyc',
     'download url' => 'https://raw.github.com/mustangostang/spyc/0.5.1/Spyc.php',
     'version arguments' => array(
