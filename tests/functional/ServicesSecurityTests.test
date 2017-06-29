@@ -1,5 +1,8 @@
 <?php
 
+include_once BACKDROP_ROOT . '/' . backdrop_get_path('module', 'services') . '/tests/services.test';
+
+
 class ServicesSecurityTests extends ServicesWebTestCase {
   // Class variables
   protected $privileged_user = NULL ;
@@ -90,10 +93,19 @@ class ServicesSecurityTests extends ServicesWebTestCase {
     list($info, $header, $status, $code, $body) = $this->parseHeader($content, $call_type);
 
     $this->verbose('POST request to: ' . $url .
-      '<hr />Arguments: ' . highlight_string('<?php ' . var_export($data, TRUE), TRUE) .
+      '<hr />Arguments: ' . highlight_string('<?php
+
+include_once BACKDROP_ROOT . '/' . backdrop_get_path('module', 'services') . '/tests/services.test';
+ ' . var_export($data, TRUE), TRUE) .
       '<hr />Raw POST body: ' . $post .
-      '<hr />Response: ' . highlight_string('<?php ' . var_export($body, TRUE), TRUE) .
-      '<hr />Curl info: ' . highlight_string('<?php ' . var_export($info, TRUE), TRUE) .
+      '<hr />Response: ' . highlight_string('<?php
+
+include_once BACKDROP_ROOT . '/' . backdrop_get_path('module', 'services') . '/tests/services.test';
+ ' . var_export($body, TRUE), TRUE) .
+      '<hr />Curl info: ' . highlight_string('<?php
+
+include_once BACKDROP_ROOT . '/' . backdrop_get_path('module', 'services') . '/tests/services.test';
+ ' . var_export($info, TRUE), TRUE) .
       '<hr />Raw response: ' . $content);
     return array('header' => $header, 'status' => $status, 'code' => $code, 'body' => $body);
   }

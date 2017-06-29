@@ -223,8 +223,14 @@ class ServicesXMLRPCTestCase extends BackdropWebTestCase {
       $this->assertTrue(empty($error_message), format_string('XMLRPC call %method run without errors.', array('%method' => $method)), 'XMLRPC call');
     }
     $this->verbose('XMLRPC request to: ' . $method .
-                   '<hr />Arguments: ' . highlight_string('<?php ' . var_export($args, TRUE), TRUE) .
-                   '<hr />Response: ' . highlight_string('<?php ' . var_export($output, TRUE), TRUE) .
+                   '<hr />Arguments: ' . highlight_string('<?php
+
+include_once BACKDROP_ROOT . '/' . backdrop_get_path('module', 'services') . '/tests/services.test';
+ ' . var_export($args, TRUE), TRUE) .
+                   '<hr />Response: ' . highlight_string('<?php
+
+include_once BACKDROP_ROOT . '/' . backdrop_get_path('module', 'services') . '/tests/services.test';
+ ' . var_export($output, TRUE), TRUE) .
                    '<hr />Error: ' . $error_message);
 
     if (!empty($error_message)) {

@@ -1,4 +1,7 @@
 <?php
+
+include_once BACKDROP_ROOT . '/' . backdrop_get_path('module', 'services') . '/tests/services.test';
+
 // $Id: ServicesResourceUserTests.test,v 1.1.2.1 2011/01/19 00:34:49 ocyrus Exp $
 
 /**

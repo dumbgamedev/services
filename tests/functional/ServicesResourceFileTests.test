@@ -1,5 +1,8 @@
 <?php
 
+include_once BACKDROP_ROOT . '/' . backdrop_get_path('module', 'services') . '/tests/services.test';
+
+
 /**
  * @file
  * Test for file resource.
