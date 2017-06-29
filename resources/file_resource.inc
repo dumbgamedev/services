@@ -218,7 +218,7 @@ function _file_resource_create_raw() {
     $scheme = file_default_scheme();
     // Set file validators: allowed extension
     $validators = array();
-    if ($extensions = variable_get('services_allowed_extensions', SERVICES_ALLOWED_EXTENSIONS)) {
+    if ($extensions = config_get('services.settings', 'services_allowed_extensions')) {
       $validators['file_validate_extensions'] = $extensions;
     }
     $file = file_save_upload($field_name, $validators, "$scheme://");
@@ -439,7 +439,7 @@ function _services_file_check_destination($destination) {
  */
 function _services_file_check_name_extension($name) {
   //Fetch the file extensions set in the variable at the time module is enabled
-  $extensions = variable_get('services_allowed_extensions', SERVICES_ALLOWED_EXTENSIONS);
+  $extensions = config_get('services.settings', 'services_allowed_extensions');
 
   // Get the part of the name after the last period (".").
   $name = explode('.', $name);

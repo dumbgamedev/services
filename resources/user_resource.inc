@@ -660,8 +660,8 @@ function _user_resource_logout() {
 
   watchdog('user', 'Session closed for %name.', array('%name' => $user->name));
 
-  $original_session_state = drupal_save_session();
-  drupal_save_session(TRUE);
+  $original_session_state = backdrop_save_session();
+  backdrop_save_session(TRUE);
 
   // Destroy the current session.
   module_invoke_all('user_logout', $user);
@@ -670,7 +670,7 @@ function _user_resource_logout() {
   // Load the anonymous user.
   $user = backdrop_anonymous_user();
 
-  drupal_save_session($original_session_state);
+  backdrop_save_session($original_session_state);
 
   return TRUE;
 }
@@ -698,8 +698,8 @@ function _user_resource_logout_1_1() {
 
   watchdog('user', 'Session closed for %name.', array('%name' => $user->name));
 
-  $original_session_state = drupal_save_session();
-  drupal_save_session(TRUE);
+  $original_session_state = backdrop_save_session();
+  backdrop_save_session(TRUE);
 
   // Destroy the current session.
   module_invoke_all('user_logout', $user);
@@ -708,7 +708,7 @@ function _user_resource_logout_1_1() {
   // Load the anonymous user.
   $user = backdrop_anonymous_user();
 
-  drupal_save_session($original_session_state);
+  backdrop_save_session($original_session_state);
 
   return $user;
 }
@@ -772,7 +772,7 @@ function _user_resource_user_pass_reset_login($uid, $timestamp, $hashed_pass) {
   else {
     // Time out, in seconds, until login URL expires. Defaults to 24 hours =
     // 86400 seconds.
-    $timeout = variable_get('user_password_reset_timeout', 86400);
+    $timeout = config_get('services.settings', 'user_password_reset_timeout');
     $current = REQUEST_TIME;
     // Some redundant checks for extra security ?
     $users = user_load_multiple(array($uid), array('status' => '1'));
@@ -789,7 +789,7 @@ function _user_resource_user_pass_reset_login($uid, $timestamp, $hashed_pass) {
         user_login_finalize();
         watchdog('user', 'User %name used one-time login link at time %timestamp.', array('%name' => $account->name, '%timestamp' => $timestamp));
         // Let the user's password be changed without the current password check.
-        $token = drupal_random_key();
+        $token = backdrop_random_key();
         $_SESSION ['pass_reset_' . $user->uid] = $token;
         return array('pass_reset_token' => $token, 'message' => t('You have just used your one-time login link. It is no longer necessary to use this link to log in. <strong>Please change your password</strong>.'));
       }

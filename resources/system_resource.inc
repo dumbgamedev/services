@@ -69,7 +69,7 @@ function _system_resource_definition() {
           ),
         ),
         'del_variable' => array(
-          'help'   => 'Deletes a system variable using variable_del().',
+          'help'   => 'Deletes a system variable using config_clear().',
           'file' => array('type' => 'inc', 'module' => 'services', 'name' => 'resources/system_resource'),
           'callback' => '_services_config_clear',
           'access arguments' => array('set a system variable'),

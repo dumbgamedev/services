@@ -49,8 +49,8 @@ class RESTServer {
     catch (ServicesException $e) {
       $result = $this->handleException($e, $controller, $arguments);
 
-      $no_body = variable_get('services_no_body_responses', array(204, 304));
-      $generate_body = variable_get('services_generate_error_body', TRUE);
+      $no_body = config_get('services.settings', 'services_no_body_responses');
+      $generate_body = config_get('services.settings', 'services_generate_error_body');
 
       if (in_array($e->getCode(), $no_body) && !$generate_body) {
         return '';
@@ -349,7 +349,7 @@ class RESTServer {
           // @see See https://www.drupal.org/node/2880909
           return services_error(
             t('Missing required argument @arg', array('@arg' => $argument_info['name'])),
-            variable_get('services_deprecated_missing_arg_code', 401)
+            config_get('services.settings', 'services_deprecated_missing_arg_code')
           );
         }
         // Set default value or NULL if default value is not set.
