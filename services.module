@@ -982,7 +982,9 @@ function services_resource_build_index_query($query, $page, $fields, $parameters
     foreach ($parameters as $parameter => $parameter_value) {
       $op = 'IN';
       if (isset($options['parameters_op']) && isset($options['parameters_op'][$parameter])) {
-        $op = strtoupper($options['parameters_op'][$parameter]);
+        if (_services_is_valid_query_op($options['parameters_op'][$parameter])) {
+          $op = strtoupper($options['parameters_op'][$parameter]);
+        }
       }
       $query->condition($parameter, services_str_getcsv($parameter_value), $op);
     }
@@ -1254,4 +1256,37 @@ function services_autoload_info() {
     'ServicesSpycLibraryTests' => 'tests/unit/ServicesSpycLibraryTests.test',
     'ServicesUITests' => 'tests/ui/ServicesUITests.test',
   );
+}
+
+/**
+ * Determines whether or not an operator is valid.
+ *
+ * @param string $op
+ *   The operator.
+ *
+ * @return bool
+ *   Whether or not the operator is valid.
+ */
+function _services_is_valid_query_op($op) {
+  return in_array(strtoupper(trim($op)), array(
+    '=',
+    '<=>',
+    '>',
+    '>=',
+    'IN',
+    'NOT IN',
+    'IS',
+    'IS NOT',
+    'IS NOT NULL',
+    'IS NULL',
+    '<',
+    '<=',
+    'LIKE',
+    '!=',
+    '<>',
+    'NOT LIKE',
+    'BETWEEN',
+    'EXISTS',
+    'NOT EXISTS',
+  ), TRUE);
 }
