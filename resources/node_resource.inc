@@ -431,7 +431,6 @@ function _node_resource_update($nid, $node) {
   $form_state = array();
   $form_state['values'] = $node;
   $form_state['values']['op'] = config_get('services.settings', 'services_node_save_button_' . $node_type . '_resource_update');
-  $form_state['node'] = $old_node;
   $form_state['programmed_bypass_access_check'] = FALSE;
 
   // Contributed modules may check the triggering element in the form state.
