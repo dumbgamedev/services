@@ -65,6 +65,9 @@ class ServicesXMLFormatter implements ServicesFormatterInterface {
         if (is_numeric($key)) {
           $key = 'item';
         }
+	      elseif (empty($item)) {
+          continue;
+    	  }
         else {
           $assoc = TRUE;
           $key = preg_replace('/[^A-Za-z0-9_]/', '_', $key);
