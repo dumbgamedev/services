@@ -481,8 +481,6 @@ function _user_resource_update($uid, $account) {
   }
 
   $form_state['values']['op'] = config_get('services.settings', 'services_user_save_button_resource_update');
-  $form_state['values']['#user_category'] = $category;
-  $form_state['values']['#account'] = $account_loaded;
   $form_state['programmed_bypass_access_check'] = FALSE;
   $ret = backdrop_form_submit('user_profile_form', $form_state, $account_loaded, $category);
 
