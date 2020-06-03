@@ -792,7 +792,7 @@ class ServicesWebTestCase extends BackdropWebTestCase {
     if (!empty($curl_options[CURLOPT_URL])) {
       // Forward Xdebug activation if present.
       if (isset($_COOKIE['XDEBUG_SESSION'])) {
-        $options = drupal_parse_url($curl_options[CURLOPT_URL]);
+        $options = backdrop_parse_url($curl_options[CURLOPT_URL]);
         $options += array('query' => array());
         $options['query'] += array('XDEBUG_SESSION_START' => $_COOKIE['XDEBUG_SESSION']);
         $curl_options[CURLOPT_URL] = url($options['path'], $options);
