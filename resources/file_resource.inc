@@ -297,14 +297,14 @@ function _file_resource_delete($fid) {
 }
 
 /**
- * Return an array of optionally paged fids baed on a set of criteria.
+ * Return an array of optionally paged fids based on a set of criteria.
  *
  * An example request might look like
  *
  * http://domain/endpoint/file?fields=fid,filename&parameters[fid]=7&parameters[uid]=1
  *
- * This would return an array of objects with only fid and filename defined, where
- * fid = 7 and uid = 1.
+ * This would return an array of objects with only fid and filename defined,
+ * where fid = 7 and uid = 1.
  *
  * @param $page
  *   Page number of results to return (in pages of 20).
