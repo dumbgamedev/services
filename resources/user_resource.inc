@@ -570,7 +570,7 @@ function _user_resource_cancel($uid) {
     'user_cancel_notify' => isset($account->data['user_cancel_notify']) ? $account->data['user_cancel_notify'] : config_get('services.settings', 'user_mail_status_canceled_notify'),
   );
   // This defult setting is defined under "admin/config/people/accounts".
-  $default_method = config_get('services.settings', 'user_cancel_method');
+  $default_method = config_get('system.core', 'user_cancel_method');
 
   // Modules use hook_user_delete() to respond to deletion.
   if ($default_method != 'user_cancel_delete') {
