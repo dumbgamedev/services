@@ -935,10 +935,16 @@ function _user_resource_access($op = 'view', $args = array()) {
       else {
         return user_access('administer users');
       }
+    case 'cancel':
+      if ($user->uid === $account->uid) {
+        return user_access('cancel account');
+      }
+      else {
+        return user_access('administer users');
+      }
     case 'password_reset':
       return TRUE;
     case 'delete':
-    case 'cancel':
     case 'resend_welcome_email':
       return user_access('administer users');
   }
