@@ -373,6 +373,16 @@ function services_theme() {
 }
 
 /**
+ * Implements hook_form_alter().
+ */
+function services_form_alter(&$form, &$form_state, $form_id) {
+  if (arg(0) === 'api') { // You might have to update this line depending on the path to your API
+    unset($form['captcha']);
+  }
+}
+
+
+/**
  * Returns information about the installed server modules on the system.
  *
  * @return array
@@ -1186,7 +1196,7 @@ function services_load_endpoint_object($name = NULL) {
 
   if (empty($schema) || !$cache_table_exists) {
     return array();
-  }  
+  }
 
   // If fetching all we are finished.
   if (!$name && $cache) {
@@ -1205,7 +1215,7 @@ function services_load_endpoint_object($name = NULL) {
     $query->condition('name', array($name), 'IN');
   }
   $result = $query->execute();
-  
+
   // Unpack the results of the query onto objects and cache them.
   foreach ($result as $data) {
     $object = new stdClass;
