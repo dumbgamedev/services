@@ -356,11 +356,6 @@ function services_endpoint_edit_form($form, &$form_state, $endpoint = NULL) {
     '#description' => t('The endpoint name can only consist of lowercase letters, underscores, and numbers.'),
   );
 
-  $form['eid'] = array(
-    '#type'  => 'value',
-    '#value' => isset($endpoint->eid) ? $endpoint->eid : '',
-  );
-
   $form['endpoint_object'] = array(
     '#type'  => 'value',
     '#value' => $endpoint,
@@ -456,9 +451,8 @@ function services_endpoint_edit_form_validate(&$form, &$form_state) {
   $query = db_select('services_endpoint', 'e');
   $query->addField('e', 'eid');
   $query->condition('path', $form_state['values']['path']);
-
-  if (!empty($form_state['values']['eid']) && is_numeric($form_state['values']['eid'])) {
-    $query->condition('eid', $form_state['values']['eid'], '!=');
+  if (!empty($form_state['values']['endpoint_object']->name)) {
+    $query->condition('name', $form_state['values']['endpoint_object']->name, '!=');
   }
 
   $res = $query->execute()->fetchField();
@@ -511,7 +505,7 @@ function services_endpoint_edit_form_submit(&$form, &$form_state) {
     }
   }
   $endpoint->authentication = $auth;
-  $endpoint->is_new = TRUE;
+  $endpoint->is_new = empty($form_state['values']['endpoint_object']);
 
   services_endpoint_save($endpoint);
   $form_state['redirect'] = 'admin/structure/services';
